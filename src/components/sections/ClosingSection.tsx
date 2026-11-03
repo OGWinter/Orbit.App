@@ -45,3 +45,4 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({
 };
 
 export default ClosingSection;
+

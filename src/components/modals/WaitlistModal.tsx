@@ -248,3 +248,4 @@ export const WaitlistModal: React.FC<WaitlistModalProps> = ({
 };
 
 export default WaitlistModal;
+

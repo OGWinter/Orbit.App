@@ -73,3 +73,4 @@ export interface AdminStats {
   total_projects: number;
   total_agent_tasks: number;
 }
+

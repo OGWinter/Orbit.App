@@ -242,3 +242,4 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
 };
 
 export default InquiryModal;
+

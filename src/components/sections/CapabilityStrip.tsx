@@ -124,3 +124,4 @@ export const CapabilityStrip: React.FC = () => {
 };
 
 export default CapabilityStrip;
+

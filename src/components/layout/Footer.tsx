@@ -101,40 +101,72 @@ export const Footer: React.FC<FooterProps> = ({
             </span>
             <span>orbit</span>
           </a>
-          <p style={{ marginTop: '12px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6, maxWidth: '280px' }}>
-            An agent-first development workspace that helps you turn ambitious ideas into working software.
+          <p style={{ marginTop: '12px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
+            The agent-first development workspace. Plan, execute, and verify software systems with autonomous AI orchestrations.
           </p>
         </div>
 
-        <div className="footer-main" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', borderBottom: '1px solid #dfe0e5', paddingBottom: '24px' }}>
-          <div>
-            <p style={{ margin: 0, color: '#83858e', fontSize: '11px' }}>
-              Autonomous AI orchestration with human-in-the-loop verification.
-            </p>
-          </div>
-          <nav style={{ display: 'flex', gap: '24px', fontSize: '12px', fontWeight: 600 }}>
+        <div className="footer-col">
+          <h5>Workspace</h5>
+          <nav aria-label="Workspace links">
             <button
               type="button"
               onClick={onOpenPlatformDemo}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit', font: 'inherit' }}
+              className="footer-nav-btn"
             >
               Platform Sandbox ↗
             </button>
             <a href="#workflow">How it works</a>
-            <a href="#for-builders">For builders</a>
+            <a href="#for-builders">Persona architecture</a>
             <button
               type="button"
               onClick={onOpenQuickStart}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit', font: 'inherit' }}
+              className="footer-nav-btn"
+              style={{ color: '#10b981' }}
             >
-              Quick Start (Win / Mac)
+              1-Click Launchers ⚡
             </button>
+          </nav>
+        </div>
+
+        <div className="footer-col">
+          <h5>Architecture</h5>
+          <nav aria-label="Architecture links">
+            <a href="#workflow">Outcome Synthesis</a>
+            <a href="#workflow">Branch Isolation</a>
+            <a href="#workflow">Headless Verification</a>
+            <a href="#for-builders">Full-Stack Sync</a>
+          </nav>
+        </div>
+
+        <div className="footer-col developer-col">
+          <h5>Developer & Admin Tools</h5>
+          <nav aria-label="Developer links">
             <button
               type="button"
               onClick={onOpenAdmin}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit', font: 'inherit' }}
+              className="footer-admin-link"
+              id="btn-footer-admin-login"
             >
-              Mission Control ◈
+              <span>◈</span> Mission Control
+            </button>
+            <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#64748b', lineHeight: 1.4 }}>
+              Internal access for waitlist review, approval dispatches, and preview database controls.
+            </p>
+            <button
+              type="button"
+              onClick={onOpenQuickStart}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#94a3b8',
+                fontSize: '11px',
+                padding: '4px 0',
+                textAlign: 'left',
+                cursor: 'pointer',
+              }}
+            >
+              Download start.bat / start.sh
             </button>
           </nav>
         </div>
@@ -142,13 +174,10 @@ export const Footer: React.FC<FooterProps> = ({
 
       {/* Footer Bottom Bar */}
       <div className="shell footer-bottom">
-        <div>
-          © {new Date().getFullYear()} Orbit. Built with React & TypeScript. All rights reserved.
-        </div>
-        <div>
-          <span>Phase 1 Design Preview</span>
-          <i style={{ fontStyle: 'normal', color: 'var(--violet)', marginLeft: '6px' }}>● Online</i>
-        </div>
+        <span>© 2026 Orbit Studio • All Rights Reserved</span>
+        <span>
+          Built for what’s next <i>✳</i>
+        </span>
       </div>
     </footer>
   );

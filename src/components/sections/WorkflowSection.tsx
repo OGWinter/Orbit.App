@@ -170,3 +170,4 @@ await expect(page.locator('.mock-product-grid')).toBeVisible();
 };
 
 export default WorkflowSection;
+

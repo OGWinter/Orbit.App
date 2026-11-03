@@ -148,3 +148,4 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
 };
 
 export default PlatformSection;
+
