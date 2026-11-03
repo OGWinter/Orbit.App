@@ -1,0 +1,47 @@
+import React from 'react';
+
+interface ClosingSectionProps {
+  onOpenWaitlist: () => void;
+  onOpenInquiry: () => void;
+}
+
+export const ClosingSection: React.FC<ClosingSectionProps> = ({
+  onOpenWaitlist,
+  onOpenInquiry,
+}) => {
+  return (
+    <section className="closing-section" id="get-started" aria-labelledby="closing-title">
+      <div className="shell closing-inner">
+        <div className="closing-orbit" aria-hidden="true">
+          <span />
+          <i />
+        </div>
+        <p className="eyebrow eyebrow-light">THE NEXT MOVE IS YOURS</p>
+        <h2 id="closing-title">
+          Give your ideas
+          <br />
+          room to <span>move.</span>
+        </h2>
+        <p>Bring your next project into focus with a workspace built around the way you think.</p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button
+            className="button button-lime btn-open-waitlist"
+            type="button"
+            onClick={onOpenWaitlist}
+          >
+            Join Early Access <span aria-hidden="true">↗</span>
+          </button>
+          <button
+            className="button button-light btn-open-inquiry"
+            type="button"
+            onClick={onOpenInquiry}
+          >
+            Request Team Demo <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default ClosingSection;

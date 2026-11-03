@@ -1,134 +1,157 @@
-import React from 'react';
-import { OrbitLogo } from '../ui/OrbitLogo';
-import { Github, Shield, CheckCircle2, ArrowUpRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { orbitStore } from '../../services/orbitStore';
 
 interface FooterProps {
-  onOpenWaitlist: () => void;
-  onOpenDocs: () => void;
+  onOpenAdmin: () => void;
+  onOpenQuickStart: () => void;
+  onOpenPlatformDemo: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenWaitlist, onOpenDocs }) => {
+export const Footer: React.FC<FooterProps> = ({
+  onOpenAdmin,
+  onOpenQuickStart,
+  onOpenPlatformDemo,
+}) => {
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanEmail = email.toLowerCase().trim();
+    if (!orbitStore.validateEmail(cleanEmail)) {
+      setFeedback({
+        type: 'error',
+        message: 'Please enter a valid work email address (e.g. name@company.com).',
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      orbitStore.subscribeNewsletter(cleanEmail, 'landing_footer');
+      setFeedback({
+        type: 'success',
+        message: `✓ Subscribed successfully! A preview confirmation is recorded for ${cleanEmail}.`,
+      });
+      setEmail('');
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Could not subscribe. Please try again.',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <footer className="border-t border-white/[0.08] bg-[#050608] pt-16 pb-12 text-sm text-[#94a3b8]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b border-white/[0.06]">
-          {/* Brand Info */}
-          <div className="md:col-span-2 space-y-4">
-            <OrbitLogo size="md" />
-            <p className="text-xs text-[#94a3b8] leading-relaxed max-w-sm">
-              The AI-powered development workspace that understands your code, plans your changes, and lets you build with confidence and complete control.
-            </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Phase 1 Design Preview — Online</span>
+    <footer className="site-footer" id="footer">
+      {/* Newsletter Subscription Bar */}
+      <div className="shell">
+        <div className="footer-newsletter-box">
+          <div className="newsletter-info">
+            <h4>Stay ahead with Orbit engineering updates</h4>
+            <p>Get bi-weekly architecture deep-dives, agent orchestration templates, and cohort release announcements.</p>
+          </div>
+          <form className="newsletter-form" onSubmit={handleSubscribe}>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (feedback) setFeedback(null);
+              }}
+              placeholder="Enter your work email"
+              required
+              aria-label="Work email for newsletter"
+            />
+            <button type="submit" disabled={submitting}>
+              {submitting ? 'Subscribing...' : 'Subscribe'}
+            </button>
+          </form>
+          {feedback && (
+            <div
+              style={{
+                width: '100%',
+                fontSize: '13px',
+                marginTop: '10px',
+                color: feedback.type === 'success' ? '#10b981' : '#ef4444',
+                fontWeight: 500,
+                lineHeight: 1.5,
+              }}
+            >
+              {feedback.message}
             </div>
-          </div>
+          )}
+        </div>
+      </div>
 
-          {/* Links Column 1: Product */}
-          <div className="space-y-3 text-xs">
-            <h4 className="font-semibold text-white uppercase tracking-wider text-[11px]">Product</h4>
-            <ul className="space-y-2.5">
-              <li>
-                <a href="#capabilities" className="hover:text-white transition-colors">
-                  Core Capabilities
-                </a>
-              </li>
-              <li>
-                <a href="#how-it-works" className="hover:text-white transition-colors">
-                  How It Works
-                </a>
-              </li>
-              <li>
-                <a href="#workspace-preview" className="hover:text-white transition-colors">
-                  Workspace Interactive Preview
-                </a>
-              </li>
-              <li>
-                <button onClick={onOpenDocs} className="hover:text-white transition-colors text-left">
-                  Architecture Specifications
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          {/* Links Column 2: Developers */}
-          <div className="space-y-3 text-xs">
-            <h4 className="font-semibold text-white uppercase tracking-wider text-[11px]">Developers</h4>
-            <ul className="space-y-2.5">
-              <li>
-                <button onClick={onOpenDocs} className="hover:text-white transition-colors text-left flex items-center gap-1">
-                  <span>Documentation</span>
-                  <ArrowUpRight className="w-3 h-3 text-[#64748b]" />
-                </button>
-              </li>
-              <li>
-                <a
-                  href="https://github.com/OGWinter/Orbit.App"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-white transition-colors flex items-center gap-1"
-                >
-                  <span>GitHub Repository</span>
-                  <ArrowUpRight className="w-3 h-3 text-[#64748b]" />
-                </a>
-              </li>
-              <li>
-                <span className="text-[#64748b]">CLI Tool (Phase 2)</span>
-              </li>
-              <li>
-                <span className="text-[#64748b]">Extensions API (Upcoming)</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Links Column 3: Trust & Updates */}
-          <div className="space-y-3 text-xs">
-            <h4 className="font-semibold text-white uppercase tracking-wider text-[11px]">Trust & Control</h4>
-            <div className="space-y-2 text-[#94a3b8]">
-              <p className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Zero model training on your code</span>
-              </p>
-              <p className="flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Local diff approval required</span>
-              </p>
-            </div>
-            <div className="pt-2">
-              <button
-                onClick={onOpenWaitlist}
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline underline-offset-4"
-              >
-                Join Early Access Cohort →
-              </button>
-            </div>
-          </div>
+      {/* Main Footer Links */}
+      <div className="shell footer-columns-grid">
+        <div className="footer-col brand-col">
+          <a className="brand footer-brand" href="#top" aria-label="Orbit home">
+            <span className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 36 36" fill="none" width="32" height="32" style={{ maxWidth: '32px', maxHeight: '32px' }}>
+                <circle cx="18" cy="18" r="12.5" stroke="currentColor" strokeWidth="1.7" />
+                <ellipse cx="18" cy="18" rx="16" ry="6.3" transform="rotate(-34 18 18)" stroke="currentColor" strokeWidth="1.7" />
+                <circle cx="29.4" cy="8.2" r="2.6" fill="currentColor" />
+              </svg>
+            </span>
+            <span>orbit</span>
+          </a>
+          <p style={{ marginTop: '12px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6, maxWidth: '280px' }}>
+            An agent-first development workspace that helps you turn ambitious ideas into working software.
+          </p>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#64748b]">
+        <div className="footer-main" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', borderBottom: '1px solid #dfe0e5', paddingBottom: '24px' }}>
           <div>
-            © {new Date().getFullYear()} Orbit. Built from scratch with React & TypeScript. All rights reserved.
+            <p style={{ margin: 0, color: '#83858e', fontSize: '11px' }}>
+              Autonomous AI orchestration with human-in-the-loop verification.
+            </p>
           </div>
-          <div className="flex items-center gap-6">
-            <span className="hover:text-[#94a3b8] transition-colors cursor-pointer">
-              Privacy Philosophy
-            </span>
-            <span className="hover:text-[#94a3b8] transition-colors cursor-pointer">
-              Terms of Service
-            </span>
-            <a
-              href="https://github.com/OGWinter/Orbit.App"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-white transition-colors"
-              aria-label="GitHub"
+          <nav style={{ display: 'flex', gap: '24px', fontSize: '12px', fontWeight: 600 }}>
+            <button
+              type="button"
+              onClick={onOpenPlatformDemo}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit', font: 'inherit' }}
             >
-              <Github className="w-4 h-4" />
-            </a>
-          </div>
+              Platform Sandbox ↗
+            </button>
+            <a href="#workflow">How it works</a>
+            <a href="#for-builders">For builders</a>
+            <button
+              type="button"
+              onClick={onOpenQuickStart}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit', font: 'inherit' }}
+            >
+              Quick Start (Win / Mac)
+            </button>
+            <button
+              type="button"
+              onClick={onOpenAdmin}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit', font: 'inherit' }}
+            >
+              Mission Control ◈
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      {/* Footer Bottom Bar */}
+      <div className="shell footer-bottom">
+        <div>
+          © {new Date().getFullYear()} Orbit. Built with React & TypeScript. All rights reserved.
+        </div>
+        <div>
+          <span>Phase 1 Design Preview</span>
+          <i style={{ fontStyle: 'normal', color: 'var(--violet)', marginLeft: '6px' }}>● Online</i>
         </div>
       </div>
     </footer>
   );
 };
+
+export default Footer;

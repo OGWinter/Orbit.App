@@ -1,177 +1,175 @@
-import React, { useState, useEffect } from 'react';
-import { OrbitLogo } from '../ui/OrbitLogo';
-import { Button } from '../ui/Button';
-import { Menu, X, Sparkles, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface HeaderProps {
   onOpenWaitlist: () => void;
-  onOpenSignIn: () => void;
-  onOpenDocs: () => void;
+  onOpenAdmin: () => void;
+  onOpenPlatformDemo: () => void;
+  onOpenQuickStart: () => void;
+  isAdminView?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenWaitlist,
-  onOpenSignIn,
-  onOpenDocs,
+  onOpenAdmin,
+  onOpenPlatformDemo,
+  onOpenQuickStart,
+  isAdminView = false,
 }) => {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const handleBrandClick = (e: React.MouseEvent) => {
+    if (isAdminView) {
+      e.preventDefault();
+      window.history.pushState(null, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+  };
 
-  const navLinks = [
-    { label: 'Capabilities', href: '#capabilities' },
-    { label: 'How it Works', href: '#how-it-works' },
-    { label: 'Workspace Preview', href: '#workspace-preview' },
-    { label: 'Documentation', onClick: onOpenDocs },
-  ];
+  const closeMenu = () => setMobileMenuOpen(false);
 
   return (
-    <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled
-            ? 'bg-[#07080b]/85 backdrop-blur-md border-b border-white/[0.08] py-3.5 shadow-lg shadow-black/50'
-            : 'bg-transparent py-5'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <a href="#" className="flex items-center focus:outline-none focus:ring-1 focus:ring-indigo-500 rounded-lg">
-              <OrbitLogo size="md" />
-            </a>
+    <header className="site-header">
+      <div className="header-inner shell">
+        {/* Brand Logo */}
+        <a href="/" className="brand" onClick={handleBrandClick} aria-label="Orbit home">
+          <span className="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 36 36" fill="none" width="32" height="32" style={{ maxWidth: '32px', maxHeight: '32px' }}>
+              <circle cx="18" cy="18" r="12.5" stroke="currentColor" strokeWidth="1.7" />
+              <ellipse cx="18" cy="18" rx="16" ry="6.3" transform="rotate(-34 18 18)" stroke="currentColor" strokeWidth="1.7" />
+              <circle cx="29.4" cy="8.2" r="2.6" fill="currentColor" />
+            </svg>
+          </span>
+          <span>orbit</span>
+        </a>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-[#94a3b8]">
-              {navLinks.map((link, idx) =>
-                link.href ? (
-                  <a
-                    key={idx}
-                    href={link.href}
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    {link.label}
-                  </a>
-                ) : (
-                  <button
-                    key={idx}
-                    onClick={link.onClick}
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    {link.label}
-                  </button>
-                )
-              )}
-            </nav>
+        {/* Mobile Hamburger Menu Toggle */}
+        <button
+          className="menu-toggle"
+          type="button"
+          aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}
+          aria-expanded={mobileMenuOpen}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <span />
+          <span />
+        </button>
 
-            {/* Desktop Actions */}
-            <div className="hidden md:flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onOpenSignIn}
-                className="text-[#94a3b8] hover:text-white"
+        {/* Navigation Links */}
+        <nav className={`main-navigation ${mobileMenuOpen ? 'is-open' : ''}`} aria-label="Main navigation">
+          {isAdminView ? (
+            <>
+              <a
+                href="/"
+                className="nav-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  closeMenu();
+                  window.history.pushState(null, '', '/');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
               >
-                Sign in
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={onOpenWaitlist}
-                iconRight={<Sparkles className="w-3.5 h-3.5" />}
-              >
-                Get Early Access
-              </Button>
-            </div>
-
-            {/* Mobile Hamburger Toggle */}
-            <div className="flex items-center gap-2 md:hidden">
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={onOpenWaitlist}
-                className="text-xs px-2.5 py-1.5"
-              >
-                Access
-              </Button>
+                ← Back to Website
+              </a>
               <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl text-[#94a3b8] hover:text-white hover:bg-white/[0.06] transition-colors"
-                aria-label="Toggle navigation menu"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Drawer / Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-30 md:hidden bg-black/80 backdrop-blur-xl pt-24 px-6 animate-fadeIn">
-          <div className="flex flex-col space-y-6 text-center">
-            <div className="flex flex-col space-y-4">
-              {navLinks.map((link, idx) =>
-                link.href ? (
-                  <a
-                    key={idx}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="text-lg font-medium text-[#cbd5e1] hover:text-white py-2"
-                  >
-                    {link.label}
-                  </a>
-                ) : (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      link.onClick?.();
-                    }}
-                    className="text-lg font-medium text-[#cbd5e1] hover:text-white py-2"
-                  >
-                    {link.label}
-                  </button>
-                )
-              )}
-            </div>
-
-            <div className="pt-6 border-t border-white/10 flex flex-col gap-3">
-              <Button
-                variant="glow"
-                size="lg"
-                className="w-full justify-center"
-                iconRight={<ArrowRight className="w-4 h-4" />}
+                type="button"
+                className="nav-cta btn-open-waitlist"
                 onClick={() => {
-                  setMobileMenuOpen(false);
+                  closeMenu();
                   onOpenWaitlist();
                 }}
               >
-                Get Early Access
-              </Button>
-              <Button
-                variant="secondary"
-                size="md"
-                className="w-full justify-center"
+                Join Waitlist <span aria-hidden="true">↗</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="nav-link"
                 onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenSignIn();
+                  closeMenu();
+                  onOpenPlatformDemo();
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  color: 'inherit',
+                  padding: 0,
+                  fontSize: '13px',
                 }}
               >
-                Sign in (Phase 1 Info)
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+                Platform Sandbox ↗
+              </button>
+
+              <a href="#workflow" onClick={closeMenu}>
+                How it works
+              </a>
+
+              <a href="#for-builders" onClick={closeMenu}>
+                For builders
+              </a>
+
+              <button
+                type="button"
+                className="nav-link"
+                onClick={() => {
+                  closeMenu();
+                  onOpenAdmin();
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  color: 'inherit',
+                  padding: 0,
+                  fontSize: '13px',
+                }}
+              >
+                Mission Control ◈
+              </button>
+
+              <button
+                type="button"
+                className="nav-link"
+                onClick={() => {
+                  closeMenu();
+                  onOpenQuickStart();
+                }}
+                style={{
+                  color: '#059669',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontSize: '13px',
+                }}
+              >
+                Start on Win / Mac ⚡
+              </button>
+
+              <button
+                type="button"
+                className="nav-cta btn-open-waitlist"
+                onClick={() => {
+                  closeMenu();
+                  onOpenWaitlist();
+                }}
+              >
+                Get started <span aria-hidden="true">↗</span>
+              </button>
+            </>
+          )}
+        </nav>
+      </div>
+    </header>
   );
 };
 
+export default Header;
