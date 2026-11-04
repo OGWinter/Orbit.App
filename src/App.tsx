@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import HeroSection from './components/sections/HeroSection';
@@ -12,97 +13,121 @@ import InquiryModal from './components/modals/InquiryModal';
 import QuickStartModal from './components/modals/QuickStartModal';
 import PlatformSandboxView from './components/views/PlatformSandboxView';
 import MissionControlView from './components/views/MissionControlView';
+import SignInView from './components/auth/SignInView';
+import RegisterView from './components/auth/RegisterView';
+import ForgotPasswordView from './components/auth/ForgotPasswordView';
+import ResetPasswordView from './components/auth/ResetPasswordView';
+import InviteAcceptanceView from './components/auth/InviteAcceptanceView';
 import { BuilderRole } from './types/orbit';
 
-export const App: React.FC = () => {
-  const [isAdminView, setIsAdminView] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.location.hash === '#admin' || window.location.pathname.startsWith('/admin');
-  });
-
-  const [isPlatformView, setIsPlatformView] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.location.hash === '#platform-sandbox' || window.location.pathname.startsWith('/platform');
-  });
+const AppContent: React.FC = () => {
+  const navigate = useNavigate();
 
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [quickStartOpen, setQuickStartOpen] = useState(false);
   const [currentRole, setCurrentRole] = useState<BuilderRole>('fullstack');
 
+  // Support legacy hash navigations gracefully
   useEffect(() => {
-    const handlePopState = () => {
-      setIsAdminView(window.location.pathname.startsWith('/admin') || window.location.hash === '#admin');
-      setIsPlatformView(window.location.pathname.startsWith('/platform') || window.location.hash === '#platform-sandbox');
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    if (window.location.hash === '#admin') {
+      navigate('/admin', { replace: true });
+    } else if (window.location.hash === '#platform-sandbox') {
+      navigate('/platform', { replace: true });
+    }
+  }, [navigate]);
 
   const openAdmin = () => {
-    window.history.pushState(null, '', '/admin');
-    setIsAdminView(true);
-    setIsPlatformView(false);
+    navigate('/admin');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const openPlatform = () => {
-    window.history.pushState(null, '', '/platform');
-    setIsPlatformView(true);
-    setIsAdminView(false);
+    navigate('/platform');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openSignIn = () => {
+    navigate('/login');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const backToWebsite = () => {
-    window.history.pushState(null, '', '/');
-    setIsAdminView(false);
-    setIsPlatformView(false);
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="orbit-app">
-      {isAdminView ? (
-        <MissionControlView onBackToWebsite={backToWebsite} />
-      ) : isPlatformView ? (
-        <PlatformSandboxView
-          onBackToWebsite={backToWebsite}
-          onOpenQuickStart={() => setQuickStartOpen(true)}
-          onOpenWaitlist={() => setWaitlistOpen(true)}
+      <Routes>
+        {/* Landing Page Route */}
+        <Route
+          path="/"
+          element={
+            <>
+              <Header
+                onOpenWaitlist={() => setWaitlistOpen(true)}
+                onOpenAdmin={openAdmin}
+                onOpenPlatformDemo={openPlatform}
+                onOpenQuickStart={() => setQuickStartOpen(true)}
+                onOpenSignIn={openSignIn}
+                isAdminView={false}
+              />
+              <main id="top">
+                <HeroSection
+                  currentBuilderRole={currentRole}
+                  onOpenQuickStart={() => setQuickStartOpen(true)}
+                  onOpenPlatformDemo={openPlatform}
+                />
+                <CapabilityStrip />
+                <PlatformSection onOpenPlatformDemo={openPlatform} />
+                <WorkflowSection />
+                <BuilderRolesSection onRoleChange={setCurrentRole} />
+                <ClosingSection
+                  onOpenWaitlist={() => setWaitlistOpen(true)}
+                  onOpenInquiry={() => setInquiryOpen(true)}
+                />
+              </main>
+              <Footer
+                onOpenAdmin={openAdmin}
+                onOpenQuickStart={() => setQuickStartOpen(true)}
+                onOpenPlatformDemo={openPlatform}
+                onOpenSignIn={openSignIn}
+              />
+            </>
+          }
         />
-      ) : (
-        <>
-          <Header
-            onOpenWaitlist={() => setWaitlistOpen(true)}
-            onOpenAdmin={openAdmin}
-            onOpenPlatformDemo={openPlatform}
-            onOpenQuickStart={() => setQuickStartOpen(true)}
-            isAdminView={false}
-          />
-          <main id="top">
-            <HeroSection
-              currentBuilderRole={currentRole}
-              onOpenQuickStart={() => setQuickStartOpen(true)}
-              onOpenPlatformDemo={openPlatform}
-            />
-            <CapabilityStrip />
-            <PlatformSection onOpenPlatformDemo={openPlatform} />
-            <WorkflowSection />
-            <BuilderRolesSection onRoleChange={setCurrentRole} />
-            <ClosingSection
-              onOpenWaitlist={() => setWaitlistOpen(true)}
-              onOpenInquiry={() => setInquiryOpen(true)}
-            />
-          </main>
-          <Footer
-            onOpenAdmin={openAdmin}
-            onOpenQuickStart={() => setQuickStartOpen(true)}
-            onOpenPlatformDemo={openPlatform}
-          />
-        </>
-      )}
 
-      {/* Modals */}
+        {/* Platform Sandbox Demo Route */}
+        <Route
+          path="/platform"
+          element={
+            <PlatformSandboxView
+              onBackToWebsite={backToWebsite}
+              onOpenQuickStart={() => setQuickStartOpen(true)}
+              onOpenWaitlist={() => setWaitlistOpen(true)}
+            />
+          }
+        />
+
+        {/* Mission Control Admin Demo Route */}
+        <Route
+          path="/admin"
+          element={<MissionControlView onBackToWebsite={backToWebsite} />}
+        />
+
+        {/* Phase 2: Authentication Routes */}
+        <Route path="/login" element={<SignInView />} />
+        <Route path="/register" element={<RegisterView />} />
+        <Route path="/forgot-password" element={<ForgotPasswordView />} />
+        <Route path="/reset-password" element={<ResetPasswordView />} />
+        <Route path="/invite" element={<InviteAcceptanceView />} />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {/* Global Modals */}
       <WaitlistModal
         isOpen={waitlistOpen}
         onClose={() => setWaitlistOpen(false)}
@@ -118,6 +143,14 @@ export const App: React.FC = () => {
         onClose={() => setQuickStartOpen(false)}
       />
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 };
 

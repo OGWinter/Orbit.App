@@ -5,12 +5,14 @@ interface FooterProps {
   onOpenAdmin: () => void;
   onOpenQuickStart: () => void;
   onOpenPlatformDemo: () => void;
+  onOpenSignIn?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onOpenAdmin,
   onOpenQuickStart,
   onOpenPlatformDemo,
+  onOpenSignIn,
 }) => {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -149,6 +151,20 @@ export const Footer: React.FC<FooterProps> = ({
               id="btn-footer-admin-login"
             >
               <span>◈</span> Mission Control
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (onOpenSignIn) onOpenSignIn();
+                else {
+                  window.history.pushState(null, '', '/login');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }
+              }}
+              className="footer-nav-btn"
+              style={{ color: '#a5b4fc', marginTop: '4px' }}
+            >
+              Developer Sign In ↗
             </button>
             <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#64748b', lineHeight: 1.4 }}>
               Internal access for waitlist review, approval dispatches, and preview database controls.

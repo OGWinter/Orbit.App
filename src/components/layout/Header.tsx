@@ -5,6 +5,7 @@ interface HeaderProps {
   onOpenAdmin: () => void;
   onOpenPlatformDemo: () => void;
   onOpenQuickStart: () => void;
+  onOpenSignIn?: () => void;
   isAdminView?: boolean;
 }
 
@@ -13,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAdmin,
   onOpenPlatformDemo,
   onOpenQuickStart,
+  onOpenSignIn,
   isAdminView = false,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -152,6 +154,30 @@ export const Header: React.FC<HeaderProps> = ({
                 }}
               >
                 Start on Win / Mac ⚡
+              </button>
+
+              <button
+                type="button"
+                className="nav-link"
+                onClick={() => {
+                  closeMenu();
+                  if (onOpenSignIn) onOpenSignIn();
+                  else {
+                    window.history.pushState(null, '', '/login');
+                    window.dispatchEvent(new PopStateEvent('popstate'));
+                  }
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  color: 'inherit',
+                  padding: 0,
+                  fontSize: '13px',
+                }}
+              >
+                Sign in
               </button>
 
               <button
