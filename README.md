@@ -19,6 +19,7 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
 1. **Site Header**:
    - Vector Orbit symbol + brand wordmark.
    - Navigation links (`Platform Sandbox ↗`, `How it works`, `For builders`, `Mission Control ◈`).
+   - Authentication status badge (authenticated user badge + Sign out button / Sign in button).
    - One-click launcher action (`Start on Win / Mac ⚡`) and early access CTA (`Get started ↗`).
    - Responsive mobile navigation drawer with hamburger toggle.
 
@@ -68,6 +69,7 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
    - **Local Runtime Launcher Modal**: One-click startup for Windows & Mac with copyable commands (`npx orbit-workspace start`).
 
 10. **Platform Sandbox Prototype (`/platform` or `#platform-sandbox`)**:
+    - Explicitly designated demonstration environment.
     - Full-screen interactive IDE with project selector and branch dropdown.
     - Code editor with file tabs (`ProductGallery.tsx`, `tailwind.config.js`, `server.ts`).
     - Staged agent audit log stream.
@@ -75,7 +77,85 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
     - Interactive e-commerce prototype of the Horizon Soundstage Speaker with live color swatches (`Warm Sand`, `Obsidian Night`, `Deep Sage`), angle thumbnails, and Add to Cart counter.
 
 11. **Mission Control Admin Dashboard (`/admin` or `#admin`)**:
-    - Complete administration portal: Overview metrics, Waitlist management table (status toggle, search, delete, CSV export), Inquiries review, Newsletter subscribers, and preview database controls.
+    - Explicitly designated internal preview portal: Overview metrics, Waitlist management table (status toggle, search, delete, CSV export), Inquiries review, Newsletter subscribers, and preview database controls.
+
+12. **Real Authentication Foundation (`/login`, `/register`, `/forgot-password`, `/reset-password`)**:
+    - Powered by Supabase Auth (`@supabase/supabase-js`).
+    - Real account registration with full name metadata and email verification enforcement.
+    - Real sign-in and sign-out with persistent sessions restored across reloads.
+    - Real password recovery dispatch and password updating via recovery tokens.
+    - Explicit error handling for missing configuration, invalid credentials, and expired recovery links.
+    - Invitation acceptance view (`/invite`) preserved as an explicit demonstration screen.
+
+---
+
+## Supabase Authentication Setup & Configuration
+
+Orbit uses **Supabase Auth** for production-grade email-and-password authentication with email verification.
+
+### 1. Create a Supabase Project
+
+1. Go to [https://supabase.com](https://supabase.com) and log in or create an account.
+2. Click **New project** and specify a Project Name (e.g. `orbit-workspace`), database password, and preferred region.
+3. Wait for the project initialization to complete.
+
+### 2. Locate Your Project URL & Public Anon Key
+
+1. In the Supabase project dashboard, navigate to **Project Settings** (gear icon) -> **API**.
+2. Under **Project URL**, copy the `URL` (e.g., `https://xyzcompany.supabase.co`).
+3. Under **Project API keys**, locate the `anon` / `public` key and copy its value.
+4. **Security Notice**: Never copy or use the `service_role` secret key in frontend code. Use strictly the `anon` public key.
+
+### 3. Configure Local Environment Variables
+
+Create a `.env` file in the project root based on `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Set the copied Supabase credentials:
+
+```env
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+*Note: If these variables are not configured or invalid, Orbit displays a clear configuration banner on all auth screens and prevents unconfigured requests.*
+
+### 4. Configure Application URL and Authentication Redirects
+
+In the Supabase Dashboard:
+
+1. Navigate to **Authentication** -> **URL Configuration**.
+2. Set **Site URL** to your local dev URL or deployed domain (e.g., `http://localhost:5173` or `https://orbit.app`).
+3. Under **Redirect URLs**, add the password recovery redirect URL:
+   - `http://localhost:5173/reset-password`
+   - `https://your-domain.com/reset-password`
+4. Click **Save**.
+
+### 5. Enable Email Confirmation
+
+1. Navigate to **Authentication** -> **Providers** -> **Email**.
+2. Ensure **Enable Email provider** is turned on.
+3. Ensure **Confirm email** is enabled so new users must verify their email address before their first sign-in.
+4. Click **Save**.
+
+---
+
+## Manual Integration Testing Checklist
+
+The automated test suite (`npm test`) uses mocked Supabase clients to verify UI states and failure modes without requiring external network connectivity. For end-to-end verification against live Supabase services:
+
+| Action | Requirements | Verification Steps |
+| :--- | :--- | :--- |
+| **Registration** | Live Supabase Project & Real Inbox | 1. Navigate to `/register`.<br>2. Fill in Name, Email, Password (8+ chars), accept Terms.<br>3. Submit form. Confirm notice: *"A confirmation email has been dispatched to [email]"*.<br>4. Inspect Supabase Dashboard -> Authentication -> Users to confirm user record with metadata. |
+| **Email Verification** | Real Email Inbox | 1. Open the verification email sent by Supabase.<br>2. Click the confirmation link.<br>3. Verify user status changes to confirmed in Supabase Dashboard. |
+| **Sign In** | Live Supabase Project & Verified User | 1. Navigate to `/login`.<br>2. Enter credentials for confirmed account.<br>3. Click *Sign In to Workspace*.<br>4. Verify redirect to `/` and header displaying user pill and *Sign out* button. |
+| **Session Restoration** | Local Browser Storage | 1. While signed in, refresh the page or open a new browser tab.<br>2. Confirm the user remains signed in without UI flicker. |
+| **Sign Out** | Active Session | 1. Click *Sign out* in the header.<br>2. Verify user badge disappears and *Sign in* button returns.<br>3. Confirm session is cleared in browser storage. |
+| **Password Recovery** | Real Email Inbox | 1. Navigate to `/forgot-password`.<br>2. Submit registered email.<br>3. Confirm notice: *"If an account exists... recovery instructions have been dispatched"*. |
+| **Password Update** | Real Email Inbox | 1. Click the recovery link in the received email (redirects to `/reset-password`).<br>2. Enter a new password matching confirmation.<br>3. Submit and confirm: *"Password updated successfully via Supabase Auth"*. |
 
 ---
 
@@ -84,6 +164,7 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
 - **Node.js Environment**: `>=20.0.0` (Node 20+ required)
 - **React 18**: Core component hierarchy (`^18.3.1`)
 - **React Router 7**: Modern client-side routing & deep-link navigation (`^7.x`)
+- **Supabase SDK**: `@supabase/supabase-js` (`^2.x`)
 - **TypeScript 5**: Strict type verification (`^5.6.3`)
 - **Vite 6**: Fast ESM bundler & dev server (`^6.0.7`)
 - **Custom Orbit CSS & Design System**: (`src/styles/orbit.css` & `src/styles/auth.css`)
@@ -93,11 +174,17 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
 ## Getting Started
 
 ```bash
+# Ensure Node.js >=20 is installed
+node -v
+
 # Install dependencies
 npm install
 
 # Start local dev server
 npm run dev
+
+# Run Vitest test suite
+npm test
 
 # Build for production
 npm run build

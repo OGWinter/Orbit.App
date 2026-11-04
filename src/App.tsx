@@ -19,6 +19,7 @@ import ForgotPasswordView from './components/auth/ForgotPasswordView';
 import ResetPasswordView from './components/auth/ResetPasswordView';
 import InviteAcceptanceView from './components/auth/InviteAcceptanceView';
 import { BuilderRole } from './types/orbit';
+import { AuthProvider } from './contexts/AuthContext';
 
 const AppContent: React.FC = () => {
   const navigate = useNavigate();
@@ -149,7 +150,9 @@ const AppContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
 };

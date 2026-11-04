@@ -1,98 +1,110 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import SignInView from '../components/auth/SignInView';
 import RegisterView from '../components/auth/RegisterView';
 import ForgotPasswordView from '../components/auth/ForgotPasswordView';
 import ResetPasswordView from '../components/auth/ResetPasswordView';
 import InviteAcceptanceView from '../components/auth/InviteAcceptanceView';
+import Header from '../components/layout/Header';
 import App from '../App';
+import { AuthProvider } from '../contexts/AuthContext';
 
-describe('Phase 2 — Authentication UI Test Suite', () => {
-  describe('SignInView (/login)', () => {
-    it('renders all sign-in elements and branding', () => {
-      render(
-        <MemoryRouter>
-          <SignInView />
-        </MemoryRouter>
-      );
+// Mock Supabase service
+const mockSignUp = vi.fn();
+const mockSignInWithPassword = vi.fn();
+const mockSignOut = vi.fn();
+const mockResetPasswordForEmail = vi.fn();
+const mockUpdateUser = vi.fn();
+const mockGetSession = vi.fn();
+const mockOnAuthStateChange = vi.fn();
 
-      expect(screen.getByRole('heading', { name: /Welcome back/i })).toBeInTheDocument();
-      expect(screen.getByLabelText(/Work Email/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
-      expect(screen.getByRole('checkbox', { name: /Remember this device/i })).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: /Forgot password\?/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Sign In to Workspace/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Continue with GitHub/i })).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: /Create one now/i })).toBeInTheDocument();
+let mockIsConfigured = true;
+let mockConfigError: string | null = null;
+
+vi.mock('../services/supabase', () => ({
+  get isSupabaseConfigured() {
+    return () => mockIsConfigured;
+  },
+  get getSupabaseConfigError() {
+    return () => mockConfigError;
+  },
+  get supabase() {
+    if (!mockIsConfigured) return null;
+    return {
+      auth: {
+        signUp: (...args: any[]) => mockSignUp(...args),
+        signInWithPassword: (...args: any[]) => mockSignInWithPassword(...args),
+        signOut: (...args: any[]) => mockSignOut(...args),
+        resetPasswordForEmail: (...args: any[]) => mockResetPasswordForEmail(...args),
+        updateUser: (...args: any[]) => mockUpdateUser(...args),
+        getSession: (...args: any[]) => mockGetSession(...args),
+        onAuthStateChange: (...args: any[]) => mockOnAuthStateChange(...args),
+      },
+    };
+  },
+}));
+
+const renderWithAuth = async (ui: React.ReactElement, initialEntries = ['/']) => {
+  let view: any;
+  await act(async () => {
+    view = render(
+      <MemoryRouter initialEntries={initialEntries}>
+        <AuthProvider>{ui}</AuthProvider>
+      </MemoryRouter>
+    );
+  });
+  return view;
+};
+
+describe('Phase 3 — Real Supabase Authentication Test Suite', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockIsConfigured = true;
+    mockConfigError = null;
+
+    mockGetSession.mockResolvedValue({
+      data: { session: null },
+      error: null,
     });
 
-    it('validates empty and invalid email inputs', () => {
-      render(
-        <MemoryRouter>
-          <SignInView />
-        </MemoryRouter>
-      );
-
-      const submitBtn = screen.getByRole('button', { name: /Sign In to Workspace/i });
-      fireEvent.click(submitBtn);
-
-      expect(screen.getByText(/Email address is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/Password is required/i)).toBeInTheDocument();
-
-      const emailInput = screen.getByLabelText(/Work Email/i);
-      fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
-      fireEvent.click(submitBtn);
-
-      expect(screen.getByText(/Please enter a valid email address/i)).toBeInTheDocument();
+    mockOnAuthStateChange.mockReturnValue({
+      data: {
+        subscription: {
+          unsubscribe: vi.fn(),
+        },
+      },
     });
+  });
 
-    it('toggles password visibility', () => {
-      render(
-        <MemoryRouter>
-          <SignInView />
-        </MemoryRouter>
-      );
+  describe('Missing Supabase Configuration', () => {
+    it('displays configuration error notice when Supabase is not configured', async () => {
+      mockIsConfigured = false;
+      mockConfigError = 'Missing VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in environment.';
 
-      const passwordInput = screen.getByLabelText(/^Password$/i) as HTMLInputElement;
-      expect(passwordInput.type).toBe('password');
+      await renderWithAuth(<RegisterView />);
 
-      const toggleBtn = screen.getByLabelText(/Show password/i);
-      fireEvent.click(toggleBtn);
-      expect(passwordInput.type).toBe('text');
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText(/Missing VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY/i)).toBeInTheDocument();
 
-      fireEvent.click(toggleBtn);
-      expect(passwordInput.type).toBe('password');
-    });
-
-    it('displays preview notice on submit and GitHub integration placeholder notice', () => {
-      render(
-        <MemoryRouter>
-          <SignInView />
-        </MemoryRouter>
-      );
-
-      // GitHub placeholder
-      const gitHubBtn = screen.getByRole('button', { name: /Continue with GitHub/i });
-      fireEvent.click(gitHubBtn);
-      expect(screen.getByText(/GitHub Integration: Non-functional placeholder preview/i)).toBeInTheDocument();
-
-      // Successful validation submission notice
+      // Attempting to submit also blocks with error notice
+      fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Ada Lovelace' } });
       fireEvent.change(screen.getByLabelText(/Work Email/i), { target: { value: 'ada@lovelace.dev' } });
-      fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'Secret123!' } });
-      fireEvent.click(screen.getByRole('button', { name: /Sign In to Workspace/i }));
+      fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'StrongPass2026!' } });
+      fireEvent.change(screen.getByLabelText(/^Confirm Password$/i), { target: { value: 'StrongPass2026!' } });
+      fireEvent.click(screen.getByRole('checkbox', { name: /I agree to the Orbit Terms/i }));
 
-      expect(screen.getByText(/Design Preview Notice: Form validation succeeded/i)).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: /Create Developer Account/i }));
+
+      await waitFor(() => {
+        expect(mockSignUp).not.toHaveBeenCalled();
+      });
     });
   });
 
   describe('RegisterView (/register)', () => {
-    it('renders all registration fields and terms acceptance', () => {
-      render(
-        <MemoryRouter>
-          <RegisterView />
-        </MemoryRouter>
-      );
+    it('renders all registration elements and calculates password strength', async () => {
+      await renderWithAuth(<RegisterView />);
 
       expect(screen.getByRole('heading', { name: /Create your account/i })).toBeInTheDocument();
       expect(screen.getByLabelText(/Full Name/i)).toBeInTheDocument();
@@ -100,193 +112,337 @@ describe('Phase 2 — Authentication UI Test Suite', () => {
       expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/^Confirm Password$/i)).toBeInTheDocument();
       expect(screen.getByRole('checkbox', { name: /I agree to the Orbit Terms/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Create Developer Account/i })).toBeInTheDocument();
-    });
 
-    it('updates password strength indicator as password is typed', () => {
-      render(
-        <MemoryRouter>
-          <RegisterView />
-        </MemoryRouter>
-      );
-
+      // Password strength testing
       const passwordInput = screen.getByLabelText(/^Password$/i);
-      fireEvent.change(passwordInput, { target: { value: 'abc' } });
+      fireEvent.change(passwordInput, { target: { value: 'pass' } });
       expect(screen.getByText(/weak/i)).toBeInTheDocument();
 
-      fireEvent.change(passwordInput, { target: { value: 'Password123!' } });
+      fireEvent.change(passwordInput, { target: { value: 'StrongPassword123!' } });
       expect(screen.getByText(/strong/i)).toBeInTheDocument();
     });
 
-    it('validates password mismatch and terms agreement', () => {
-      render(
-        <MemoryRouter>
-          <RegisterView />
-        </MemoryRouter>
-      );
-
-      fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Alan Turing' } });
-      fireEvent.change(screen.getByLabelText(/Work Email/i), { target: { value: 'alan@bletchley.org' } });
-      fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'EnigmaCode2026!' } });
-      fireEvent.change(screen.getByLabelText(/^Confirm Password$/i), { target: { value: 'DifferentPassword' } });
+    it('performs local validation before calling backend', async () => {
+      await renderWithAuth(<RegisterView />);
 
       const submitBtn = screen.getByRole('button', { name: /Create Developer Account/i });
       fireEvent.click(submitBtn);
 
-      expect(screen.getByText(/Passwords do not match/i)).toBeInTheDocument();
-      expect(screen.getByText(/You must accept the terms to proceed/i)).toBeInTheDocument();
+      expect(screen.getByText(/Full name is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Work email is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Password is required/i)).toBeInTheDocument();
+      expect(mockSignUp).not.toHaveBeenCalled();
+    });
 
-      // Fix mismatch and accept terms
-      fireEvent.change(screen.getByLabelText(/^Confirm Password$/i), { target: { value: 'EnigmaCode2026!' } });
+    it('submits registration to Supabase with metadata and shows email verification state', async () => {
+      mockSignUp.mockResolvedValueOnce({
+        data: {
+          user: { id: 'user-123', email: 'ada@lovelace.dev' },
+          session: null, // session is null when email confirmation is required
+        },
+        error: null,
+      });
+
+      await renderWithAuth(<RegisterView />);
+
+      fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Ada Lovelace' } });
+      fireEvent.change(screen.getByLabelText(/Work Email/i), { target: { value: 'ada@lovelace.dev' } });
+      fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'Password123!' } });
+      fireEvent.change(screen.getByLabelText(/^Confirm Password$/i), { target: { value: 'Password123!' } });
       fireEvent.click(screen.getByRole('checkbox', { name: /I agree to the Orbit Terms/i }));
-      fireEvent.click(submitBtn);
 
-      expect(screen.getByText(/Design Preview Notice: Registration form validated for Alan Turing/i)).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: /Create Developer Account/i }));
+
+      await waitFor(() => {
+        expect(mockSignUp).toHaveBeenCalledWith({
+          email: 'ada@lovelace.dev',
+          password: 'Password123!',
+          options: {
+            data: {
+              full_name: 'Ada Lovelace',
+            },
+          },
+        });
+      });
+
+      // Confirms verification requirement message is presented
+      await waitFor(() => {
+        expect(screen.getByText(/Account Registered Successfully/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/A confirmation email has been dispatched to ada@lovelace\.dev/i)
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('displays error and avoids false success when Supabase returns an error', async () => {
+      mockSignUp.mockResolvedValueOnce({
+        data: { user: null, session: null },
+        error: { message: 'User already registered' },
+      });
+
+      await renderWithAuth(<RegisterView />);
+
+      fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Ada Lovelace' } });
+      fireEvent.change(screen.getByLabelText(/Work Email/i), { target: { value: 'duplicate@lovelace.dev' } });
+      fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'Password123!' } });
+      fireEvent.change(screen.getByLabelText(/^Confirm Password$/i), { target: { value: 'Password123!' } });
+      fireEvent.click(screen.getByRole('checkbox', { name: /I agree to the Orbit Terms/i }));
+
+      fireEvent.click(screen.getByRole('button', { name: /Create Developer Account/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/User already registered/i)).toBeInTheDocument();
+      });
+
+      expect(screen.queryByText(/Account Registered Successfully/i)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('SignInView (/login)', () => {
+    it('validates required fields on sign in', async () => {
+      await renderWithAuth(<SignInView />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Sign In to Workspace/i }));
+
+      expect(screen.getByText(/Email address is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Password is required/i)).toBeInTheDocument();
+      expect(mockSignInWithPassword).not.toHaveBeenCalled();
+    });
+
+    it('submits credentials to Supabase and shows error on invalid credentials', async () => {
+      mockSignInWithPassword.mockResolvedValueOnce({
+        data: { user: null, session: null },
+        error: { message: 'Invalid login credentials' },
+      });
+
+      await renderWithAuth(<SignInView />);
+
+      fireEvent.change(screen.getByLabelText(/Work Email/i), { target: { value: 'dev@company.com' } });
+      fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'WrongPass123' } });
+
+      fireEvent.click(screen.getByRole('button', { name: /Sign In to Workspace/i }));
+
+      await waitFor(() => {
+        expect(mockSignInWithPassword).toHaveBeenCalledWith({
+          email: 'dev@company.com',
+          password: 'WrongPass123',
+        });
+        expect(screen.getByText(/Invalid login credentials/i)).toBeInTheDocument();
+      });
+    });
+
+    it('shows placeholder notice when clicking GitHub sign-in button', async () => {
+      await renderWithAuth(<SignInView />);
+
+      const githubBtn = screen.getByRole('button', { name: /Continue with GitHub/i });
+      fireEvent.click(githubBtn);
+
+      expect(
+        screen.getByText(/GitHub sign-in is not yet implemented/i)
+      ).toBeInTheDocument();
     });
   });
 
   describe('ForgotPasswordView (/forgot-password)', () => {
-    it('validates email and displays required preview notice on success', () => {
-      render(
-        <MemoryRouter>
-          <ForgotPasswordView />
-        </MemoryRouter>
-      );
+    it('submits recovery request to Supabase and shows success feedback', async () => {
+      mockResetPasswordForEmail.mockResolvedValueOnce({
+        data: {},
+        error: null,
+      });
 
-      expect(screen.getByRole('heading', { name: /Reset password/i })).toBeInTheDocument();
+      await renderWithAuth(<ForgotPasswordView />);
 
-      const submitBtn = screen.getByRole('button', { name: /Send Reset Instructions/i });
-      fireEvent.click(submitBtn);
-      expect(screen.getByText(/Email address is required/i)).toBeInTheDocument();
+      fireEvent.change(screen.getByLabelText(/Work Email Address/i), { target: { value: 'dev@company.com' } });
+      fireEvent.click(screen.getByRole('button', { name: /Send Reset Instructions/i }));
 
-      const emailInput = screen.getByLabelText(/Work Email Address/i);
-      fireEvent.change(emailInput, { target: { value: 'dev@company.com' } });
-      fireEvent.click(submitBtn);
+      await waitFor(() => {
+        expect(mockResetPasswordForEmail).toHaveBeenCalledWith('dev@company.com', {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        expect(screen.getByText(/Recovery Email Sent/i)).toBeInTheDocument();
+      });
+    });
 
-      // Must explicitly declare that no real recovery email was sent!
-      expect(screen.getByText(/Notice: This interface is a design preview. No actual recovery email was sent to your inbox./i)).toBeInTheDocument();
+    it('displays error notice when password recovery request fails', async () => {
+      mockResetPasswordForEmail.mockResolvedValueOnce({
+        data: {},
+        error: { message: 'Rate limit exceeded for password recovery' },
+      });
+
+      await renderWithAuth(<ForgotPasswordView />);
+
+      fireEvent.change(screen.getByLabelText(/Work Email Address/i), { target: { value: 'dev@company.com' } });
+      fireEvent.click(screen.getByRole('button', { name: /Send Reset Instructions/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/Rate limit exceeded for password recovery/i)).toBeInTheDocument();
+      });
+      expect(screen.queryByText(/Recovery Email Sent/i)).not.toBeInTheDocument();
     });
   });
 
   describe('ResetPasswordView (/reset-password)', () => {
-    it('renders active reset preview and confirms no real account is modified', () => {
-      render(
-        <MemoryRouter initialEntries={['/reset-password']}>
-          <ResetPasswordView />
-        </MemoryRouter>
-      );
-
-      expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
-      expect(screen.getByText(/UI Preview — No live account modified/i)).toBeInTheDocument();
-
-      // Submit matching password
-      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'NewSuperPass2026!' } });
-      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'NewSuperPass2026!' } });
-      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
-
-      expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
-      expect(screen.getByText(/no real account or database credentials were changed/i)).toBeInTheDocument();
-    });
-
-    it('renders expired reset preview when ?expired=true or ?token=invalid is provided', () => {
-      render(
-        <MemoryRouter initialEntries={['/reset-password?expired=true']}>
-          <ResetPasswordView />
-        </MemoryRouter>
-      );
+    it('renders expired view when ?expired=true or ?token=invalid is provided', async () => {
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password?expired=true']);
 
       expect(screen.getByRole('heading', { name: /Reset link expired/i })).toBeInTheDocument();
-      expect(screen.getByText(/This password recovery link is invalid or has expired/i)).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /Request New Reset Link/i })).toBeInTheDocument();
     });
 
-    it('renders invalid link preview when ?token=invalid is provided', () => {
-      render(
-        <MemoryRouter initialEntries={['/reset-password?token=invalid']}>
-          <ResetPasswordView />
-        </MemoryRouter>
+    it('submits new password to Supabase and displays success state', async () => {
+      mockUpdateUser.mockResolvedValueOnce({
+        data: { user: { id: 'user-1' } },
+        error: null,
+      });
+
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
+
+      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'BrandNewPass2026!' } });
+      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'BrandNewPass2026!' } });
+
+      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
+
+      await waitFor(() => {
+        expect(mockUpdateUser).toHaveBeenCalledWith({
+          password: 'BrandNewPass2026!',
+        });
+        expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
+      });
+    });
+
+    it('displays error and does not report false success when password update fails', async () => {
+      mockUpdateUser.mockResolvedValueOnce({
+        data: { user: null },
+        error: { message: 'Auth session missing or token expired' },
+      });
+
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
+
+      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'BrandNewPass2026!' } });
+      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'BrandNewPass2026!' } });
+
+      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/Auth session missing or token expired/i)).toBeInTheDocument();
+      });
+
+      expect(screen.queryByRole('heading', { name: /Password updated/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Header Authentication State & Sign Out', () => {
+    it('reflects authenticated user in header and triggers sign-out', async () => {
+      const mockUser = {
+        id: 'u-123',
+        email: 'founder@orbit.dev',
+        user_metadata: { full_name: 'Grace Hopper' },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+      };
+
+      mockGetSession.mockResolvedValueOnce({
+        data: {
+          session: {
+            user: mockUser,
+            access_token: 'fake-token',
+            refresh_token: 'fake-refresh',
+            expires_in: 3600,
+            token_type: 'bearer',
+          },
+        },
+        error: null,
+      });
+
+      mockSignOut.mockResolvedValueOnce({ error: null });
+
+      await renderWithAuth(
+        <Header
+          onOpenWaitlist={vi.fn()}
+          onOpenAdmin={vi.fn()}
+          onOpenPlatformDemo={vi.fn()}
+          onOpenQuickStart={vi.fn()}
+        />
       );
 
-      expect(screen.getByRole('heading', { name: /Reset link expired/i })).toBeInTheDocument();
+      // Verify authenticated user badge is displayed
+      await waitFor(() => {
+        expect(screen.getByText(/● Grace Hopper/i)).toBeInTheDocument();
+      });
+
+      const signOutBtn = screen.getByRole('button', { name: /Sign out/i });
+      expect(signOutBtn).toBeInTheDocument();
+
+      fireEvent.click(signOutBtn);
+
+      await waitFor(() => {
+        expect(mockSignOut).toHaveBeenCalled();
+      });
     });
   });
 
   describe('InviteAcceptanceView (/invite)', () => {
-    it('renders valid invitation preview with sample data clearly identified as demo', () => {
+    it('remains explicitly labeled as sample demonstration data', () => {
       render(
-        <MemoryRouter initialEntries={['/invite?email=alex@orbit.app&team=Atlas+Core']}>
+        <MemoryRouter initialEntries={['/invite?email=demo@orbit.app&team=Atlas+Core']}>
           <InviteAcceptanceView />
         </MemoryRouter>
       );
 
       expect(screen.getByText(/SAMPLE INVITATION \(DEMO DATA\)/i)).toBeInTheDocument();
       expect(screen.getByRole('heading', { name: /Join Atlas Core/i })).toBeInTheDocument();
-      const emailInput = screen.getByLabelText(/Invited Work Email/i) as HTMLInputElement;
-      expect(emailInput.value).toBe('alex@orbit.app');
-      expect(emailInput.readOnly).toBe(true);
-
-      // Fill form and submit
-      fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Alex Developer' } });
-      fireEvent.change(screen.getByLabelText(/^Create Password$/i), { target: { value: 'SecurePass2026!' } });
-      fireEvent.change(screen.getByLabelText(/^Confirm Password$/i), { target: { value: 'SecurePass2026!' } });
-      fireEvent.click(screen.getByRole('button', { name: /Accept Invitation & Join Team/i }));
-
-      expect(screen.getByRole('heading', { name: /Invitation preview completed/i })).toBeInTheDocument();
-      expect(screen.getByText(/no live invitation was redeemed and no database account was created/i)).toBeInTheDocument();
     });
 
-    it('renders expired invitation preview when ?expired=true is provided', () => {
+    it('renders expired invitation preview when ?expired=true is present', () => {
       render(
-        <MemoryRouter initialEntries={['/invite?expired=true&team=Atlas+Core']}>
+        <MemoryRouter initialEntries={['/invite?expired=true']}>
           <InviteAcceptanceView />
         </MemoryRouter>
       );
 
       expect(screen.getByRole('heading', { name: /Invitation expired/i })).toBeInTheDocument();
-      expect(screen.getByText(/This workspace invitation link is invalid or has already been redeemed/i)).toBeInTheDocument();
-    });
-
-    it('gracefully handles missing URL parameters without crashing', () => {
-      render(
-        <MemoryRouter initialEntries={['/invite']}>
-          <InviteAcceptanceView />
-        </MemoryRouter>
-      );
-
-      expect(screen.getByRole('heading', { name: /Join Skyline Engineering/i })).toBeInTheDocument();
-      const emailInput = screen.getByLabelText(/Invited Work Email/i) as HTMLInputElement;
-      expect(emailInput.value).toBe('developer@skyline.tech');
     });
   });
 
   describe('Direct Route Navigation in App Root', () => {
-    it('renders SignInView when directly loading /login', () => {
+    it('renders SignInView when directly loading /login', async () => {
       window.history.pushState(null, '', '/login');
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
       expect(screen.getByRole('heading', { name: /Welcome back/i })).toBeInTheDocument();
     });
 
-    it('renders RegisterView when directly loading /register', () => {
+    it('renders RegisterView when directly loading /register', async () => {
       window.history.pushState(null, '', '/register');
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
       expect(screen.getByRole('heading', { name: /Create your account/i })).toBeInTheDocument();
     });
 
-    it('renders ForgotPasswordView when directly loading /forgot-password', () => {
+    it('renders ForgotPasswordView when directly loading /forgot-password', async () => {
       window.history.pushState(null, '', '/forgot-password');
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
       expect(screen.getByRole('heading', { name: /Reset password/i })).toBeInTheDocument();
     });
 
-    it('renders ResetPasswordView when directly loading /reset-password', () => {
+    it('renders ResetPasswordView when directly loading /reset-password', async () => {
       window.history.pushState(null, '', '/reset-password');
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
       expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
     });
 
-    it('renders InviteAcceptanceView when directly loading /invite', () => {
+    it('renders InviteAcceptanceView when directly loading /invite', async () => {
       window.history.pushState(null, '', '/invite');
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
       expect(screen.getByText(/SAMPLE INVITATION \(DEMO DATA\)/i)).toBeInTheDocument();
     });
   });

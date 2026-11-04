@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const ForgotPasswordView: React.FC = () => {
+  const { resetPasswordForEmail, isConfigured, configError } = useAuth();
+
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const validate = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,18 +27,39 @@ export const ForgotPasswordView: React.FC = () => {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
+
     if (!validate()) return;
 
-    setSubmittedEmail(email.trim());
-    setIsSubmitted(true);
+    if (!isConfigured) {
+      setServerError(configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const { error: resetError } = await resetPasswordForEmail(email.trim());
+
+      if (resetError) {
+        setServerError(resetError.message || 'Could not send recovery email. Please check the address and try again.');
+      } else {
+        setSubmittedEmail(email.trim());
+        setIsSubmitted(true);
+      }
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : 'An unexpected error occurred during password recovery.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleResetForm = () => {
     setIsSubmitted(false);
     setEmail('');
     setError(null);
+    setServerError(null);
   };
 
   return (
@@ -48,32 +74,50 @@ export const ForgotPasswordView: React.FC = () => {
         <div className="auth-card-header">
           <h1>Reset password</h1>
           <p>
-            Enter the work email associated with your Orbit account and we’ll prepare recovery steps.
+            Enter the work email associated with your Orbit account and we’ll send you password recovery instructions.
           </p>
         </div>
+
+        {!isConfigured && (
+          <div className="auth-notice-box error" role="alert" style={{ marginBottom: '20px' }}>
+            <span>⚠</span>
+            <div>
+              <strong>Configuration Required:</strong>
+              <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
+                {configError || 'Supabase environment variables are missing. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable authentication.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {serverError && (
+          <div className="auth-notice-box error" role="alert" style={{ marginBottom: '20px' }}>
+            <span>⚠</span>
+            <div>
+              <strong>Recovery Error:</strong>
+              <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
+                {serverError}
+              </p>
+            </div>
+          </div>
+        )}
 
         {isSubmitted ? (
           <div>
             <div className="auth-notice-box success" role="status">
               <span style={{ fontSize: '18px' }}>✓</span>
               <div>
-                <strong>Recovery Request Recorded (Design Preview)</strong>
+                <strong>Recovery Email Sent</strong>
                 <p style={{ margin: '6px 0 0', fontSize: '13px', lineHeight: 1.5 }}>
-                  In a production release, a secure token would be dispatched to{' '}
-                  <strong style={{ color: '#f8fafc' }}>{submittedEmail}</strong>.
+                  If an account exists for <strong style={{ color: '#f8fafc' }}>{submittedEmail}</strong>, an email with password recovery instructions has been dispatched via Supabase Auth.
                 </p>
-                <p style={{ margin: '8px 0 0', fontSize: '12px', opacity: 0.85 }}>
-                  <em>
-                    Notice: This interface is a design preview. No actual recovery email was sent to your inbox.
-                  </em>
+                <p style={{ margin: '8px 0 0', fontSize: '12px', opacity: 0.9 }}>
+                  Please check your inbox (and spam folder) and click the link to create a new password.
                 </p>
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '24px' }}>
-              <Link to={`/reset-password?email=${encodeURIComponent(submittedEmail)}`} className="auth-submit-btn" style={{ textDecoration: 'none' }}>
-                Preview Reset Password Flow <span>→</span>
-              </Link>
               <button
                 type="button"
                 onClick={handleResetForm}
@@ -102,6 +146,7 @@ export const ForgotPasswordView: React.FC = () => {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     if (error) setError(null);
+                    if (serverError) setServerError(null);
                   }}
                   placeholder="name@company.com"
                   className={`auth-input ${error ? 'has-error' : ''}`}
@@ -109,6 +154,7 @@ export const ForgotPasswordView: React.FC = () => {
                   required
                   aria-invalid={!!error}
                   aria-describedby={error ? 'forgot-email-error' : undefined}
+                  disabled={submitting}
                 />
               </div>
               {error && (
@@ -118,8 +164,8 @@ export const ForgotPasswordView: React.FC = () => {
               )}
             </div>
 
-            <button type="submit" className="auth-submit-btn">
-              Send Reset Instructions <span>→</span>
+            <button type="submit" className="auth-submit-btn" disabled={submitting}>
+              {submitting ? 'Sending instructions...' : 'Send Reset Instructions'} <span>→</span>
             </button>
 
             <div className="auth-footer-prompt">
@@ -134,4 +180,3 @@ export const ForgotPasswordView: React.FC = () => {
 };
 
 export default ForgotPasswordView;
-

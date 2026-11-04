@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface HeaderProps {
   onOpenWaitlist: () => void;
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   isAdminView = false,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut, loading } = useAuth();
 
   const handleBrandClick = (e: React.MouseEvent) => {
     if (isAdminView) {
@@ -28,6 +30,23 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const closeMenu = () => setMobileMenuOpen(false);
+
+  const handleSignOut = async () => {
+    closeMenu();
+    await signOut();
+  };
+
+  const handleSignInClick = () => {
+    closeMenu();
+    if (onOpenSignIn) onOpenSignIn();
+    else {
+      window.history.pushState(null, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+  };
+
+  const userDisplayName =
+    user?.user_metadata?.full_name || (user?.email ? user.email.split('@')[0] : 'Developer');
 
   return (
     <header className="site-header">
@@ -156,29 +175,65 @@ export const Header: React.FC<HeaderProps> = ({
                 Start on Win / Mac ⚡
               </button>
 
-              <button
-                type="button"
-                className="nav-link"
-                onClick={() => {
-                  closeMenu();
-                  if (onOpenSignIn) onOpenSignIn();
-                  else {
-                    window.history.pushState(null, '', '/login');
-                    window.dispatchEvent(new PopStateEvent('popstate'));
-                  }
-                }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  color: 'inherit',
-                  padding: 0,
-                  fontSize: '13px',
-                }}
-              >
-                Sign in
-              </button>
+              {/* Authentication Status in Header */}
+              {user ? (
+                <>
+                  <span
+                    className="nav-user-badge"
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'var(--ink, #16171d)',
+                      background: 'rgba(99, 102, 241, 0.12)',
+                      border: '1px solid rgba(99, 102, 241, 0.25)',
+                      padding: '4px 10px',
+                      borderRadius: '999px',
+                      maxWidth: '180px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                    title={user.email}
+                  >
+                    ● {userDisplayName}
+                  </span>
+                  <button
+                    type="button"
+                    className="nav-link btn-sign-out"
+                    onClick={handleSignOut}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                      color: '#ef4444',
+                      padding: 0,
+                      fontSize: '13px',
+                    }}
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                !loading && (
+                  <button
+                    type="button"
+                    className="nav-link btn-sign-in"
+                    onClick={handleSignInClick}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                      color: 'inherit',
+                      padding: 0,
+                      fontSize: '13px',
+                    }}
+                  >
+                    Sign in
+                  </button>
+                )
+              )}
 
               <button
                 type="button"

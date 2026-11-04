@@ -1,16 +1,30 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const ResetPasswordView: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const isLinkExpired = searchParams.get('expired') === 'true' || searchParams.get('token') === 'invalid';
+  const { updatePassword, isConfigured, configError } = useAuth();
+
+  // Detect expired or invalid link from search params or hash fragment
+  const isHashError =
+    typeof window !== 'undefined' &&
+    (window.location.hash.includes('error=') || window.location.hash.includes('otp_expired'));
+
+  const isLinkExpired =
+    searchParams.get('expired') === 'true' ||
+    searchParams.get('token') === 'invalid' ||
+    searchParams.get('error') !== null ||
+    isHashError;
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{ newPassword?: string; confirmPassword?: string }>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   // Password strength calculation
@@ -52,10 +66,39 @@ export const ResetPasswordView: React.FC = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
+
     if (!validate()) return;
-    setIsSuccess(true);
+
+    if (!isConfigured) {
+      setServerError(
+        configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.'
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const { error } = await updatePassword(newPassword);
+
+      if (error) {
+        setServerError(
+          error.message || 'Unable to update password. Your recovery link may be expired or already used.'
+        );
+      } else {
+        setIsSuccess(true);
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    } catch (err) {
+      setServerError(
+        err instanceof Error ? err.message : 'An unexpected error occurred while updating your password.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -85,20 +128,20 @@ export const ResetPasswordView: React.FC = () => {
                   marginBottom: '10px',
                 }}
               >
-                <span>⚠</span> EXPIRED LINK PREVIEW
+                <span>⚠</span> EXPIRED OR INVALID LINK
               </div>
               <h1 style={{ color: '#f87171' }}>Reset link expired</h1>
               <p>
-                This password recovery link is invalid or has expired. For your security, reset links are only active for 60 minutes.
+                This password recovery link is invalid or has expired. For your security, reset links can only be used once and expire after 60 minutes.
               </p>
             </div>
 
             <div className="auth-notice-box error" role="alert">
               <span>⚠</span>
               <div>
-                <strong>Invalid Link Demonstration:</strong>
+                <strong>Recovery Link Status:</strong>
                 <p style={{ margin: '4px 0 0', fontSize: '12px' }}>
-                  This screen is rendered because the link parameter was flagged as expired (<code style={{ color: '#fca5a5', background: 'rgba(0,0,0,0.2)', padding: '1px 4px', borderRadius: '4px' }}>?expired=true</code> or <code style={{ color: '#fca5a5', background: 'rgba(0,0,0,0.2)', padding: '1px 4px', borderRadius: '4px' }}>?token=invalid</code>).
+                  The reset token is no longer valid. Please request a fresh password reset link below.
                 </p>
               </div>
             </div>
@@ -131,18 +174,18 @@ export const ResetPasswordView: React.FC = () => {
                   marginBottom: '10px',
                 }}
               >
-                <span>✓</span> DESIGN PREVIEW
+                <span>✓</span> PASSWORD UPDATED
               </div>
               <h1>Password updated</h1>
-              <p>Your password reset form validation has succeeded in preview mode.</p>
+              <p>Your Orbit account password has been updated successfully via Supabase Auth.</p>
             </div>
 
             <div className="auth-notice-box success" role="status">
               <span style={{ fontSize: '18px' }}>✓</span>
               <div>
-                <strong>Design Preview Notice:</strong>
+                <strong>Update Confirmed</strong>
                 <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
-                  Form submission validated locally with 0 errors. Notice: This is a design preview — no real account or database credentials were changed. Real token verification and credential hashing will be wired in the backend phase.
+                  Your new credentials are now active. You can sign in to your developer workspace with your new password.
                 </p>
               </div>
             </div>
@@ -156,26 +199,33 @@ export const ResetPasswordView: React.FC = () => {
         ) : (
           <div>
             <div className="auth-card-header">
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'rgba(117, 100, 245, 0.12)',
-                  border: '1px solid rgba(117, 100, 245, 0.28)',
-                  padding: '3px 9px',
-                  borderRadius: '999px',
-                  color: '#c4b5fd',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  marginBottom: '10px',
-                }}
-              >
-                <span className="live-dot" /> DESIGN PREVIEW
-              </div>
               <h1>Choose a new password</h1>
-              <p>Set a strong password to safeguard your repositories and workspace. (UI Preview — No live account modified)</p>
+              <p>Set a strong password to safeguard your repositories and developer workspace.</p>
             </div>
+
+            {!isConfigured && (
+              <div className="auth-notice-box error" role="alert" style={{ marginBottom: '20px' }}>
+                <span>⚠</span>
+                <div>
+                  <strong>Configuration Required:</strong>
+                  <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
+                    {configError || 'Supabase environment variables are missing. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable password updates.'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {serverError && (
+              <div className="auth-notice-box error" role="alert" style={{ marginBottom: '20px' }}>
+                <span>⚠</span>
+                <div>
+                  <strong>Update Failed:</strong>
+                  <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
+                    {serverError}
+                  </p>
+                </div>
+              </div>
+            )}
 
             <form className="auth-form" onSubmit={handleSubmit} noValidate>
               {/* New Password */}
@@ -191,6 +241,7 @@ export const ResetPasswordView: React.FC = () => {
                     onChange={(e) => {
                       setNewPassword(e.target.value);
                       if (errors.newPassword) setErrors((prev) => ({ ...prev, newPassword: undefined }));
+                      if (serverError) setServerError(null);
                     }}
                     placeholder="Enter at least 8 characters"
                     className={`auth-input has-icon-right ${errors.newPassword ? 'has-error' : ''}`}
@@ -198,12 +249,14 @@ export const ResetPasswordView: React.FC = () => {
                     required
                     aria-invalid={!!errors.newPassword}
                     aria-describedby={errors.newPassword ? 'reset-pass-error' : undefined}
+                    disabled={submitting}
                   />
                   <button
                     type="button"
                     className="auth-eye-btn"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                    disabled={submitting}
                   >
                     {showNewPassword ? '👁' : '👁‍🗨'}
                   </button>
@@ -267,6 +320,7 @@ export const ResetPasswordView: React.FC = () => {
                       if (newPassword && e.target.value !== newPassword) {
                         setErrors((prev) => ({ ...prev, confirmPassword: 'Passwords do not match' }));
                       }
+                      if (serverError) setServerError(null);
                     }}
                     placeholder="Re-enter your new password"
                     className={`auth-input has-icon-right ${errors.confirmPassword ? 'has-error' : ''}`}
@@ -274,12 +328,14 @@ export const ResetPasswordView: React.FC = () => {
                     required
                     aria-invalid={!!errors.confirmPassword}
                     aria-describedby={errors.confirmPassword ? 'reset-confirm-error' : undefined}
+                    disabled={submitting}
                   />
                   <button
                     type="button"
                     className="auth-eye-btn"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                    disabled={submitting}
                   >
                     {showConfirmPassword ? '👁' : '👁‍🗨'}
                   </button>
@@ -291,8 +347,8 @@ export const ResetPasswordView: React.FC = () => {
                 )}
               </div>
 
-              <button type="submit" className="auth-submit-btn">
-                Update Password <span>→</span>
+              <button type="submit" className="auth-submit-btn" disabled={submitting}>
+                {submitting ? 'Updating password...' : 'Update Password'} <span>→</span>
               </button>
             </form>
 
@@ -308,4 +364,3 @@ export const ResetPasswordView: React.FC = () => {
 };
 
 export default ResetPasswordView;
-
