@@ -219,10 +219,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      if (!error && data) {
+        const currentUser = (data.session && (data.session as any).user) || data.user || null;
+        if (data.session) {
+          setSession(data.session);
+        }
+        if (currentUser) {
+          setUser(currentUser);
+        }
+      }
 
       return { error };
     } catch (err) {

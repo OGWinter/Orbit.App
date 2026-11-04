@@ -7,6 +7,7 @@ interface HeaderProps {
   onOpenPlatformDemo: () => void;
   onOpenQuickStart: () => void;
   onOpenSignIn?: () => void;
+  onOpenWorkspace?: () => void;
   isAdminView?: boolean;
 }
 
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenPlatformDemo,
   onOpenQuickStart,
   onOpenSignIn,
+  onOpenWorkspace,
   isAdminView = false,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,6 +43,15 @@ export const Header: React.FC<HeaderProps> = ({
     if (onOpenSignIn) onOpenSignIn();
     else {
       window.history.pushState(null, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+  };
+
+  const handleWorkspaceClick = () => {
+    closeMenu();
+    if (onOpenWorkspace) onOpenWorkspace();
+    else {
+      window.history.pushState(null, '', '/workspace');
       window.dispatchEvent(new PopStateEvent('popstate'));
     }
   };
@@ -178,6 +189,25 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Authentication Status in Header */}
               {user ? (
                 <>
+                  <button
+                    type="button"
+                    className="nav-link btn-open-workspace"
+                    onClick={handleWorkspaceClick}
+                    style={{
+                      color: 'var(--violet-dark, #5746dc)',
+                      fontWeight: 700,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      fontSize: '13px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    Open Workspace →
+                  </button>
                   <span
                     className="nav-user-badge"
                     style={{

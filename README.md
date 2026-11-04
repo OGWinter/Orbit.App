@@ -91,6 +91,18 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
     - Explicit error handling for missing configuration, invalid credentials, and expired recovery links.
     - Invitation acceptance view (`/invite`) preserved as an explicit demonstration screen.
 
+13. **Authenticated Developer Workspace (`/workspace`)**:
+    - The real authenticated developer application area, protected by the `ProtectedRoute` guard.
+    - Requires active Supabase authentication; unauthenticated visitors are redirected to `/login` with internal return destination preservation.
+    - Validates post-sign-in redirects with open redirect protection against external or malformed URLs (defaults to `/workspace`).
+    - Sidebar with active Overview navigation, truthful "Coming soon" indicators for Projects and Activity, user avatar/identity, and instant sign-out.
+    - Honest empty states: clearly communicates that no repositories or projects are connected yet (0 connected repositories, 0 active branches, 0 staged reviews).
+    - Important architectural distinctions:
+      - `/` remains the public marketing website.
+      - `/workspace` is the production authenticated environment shell.
+      - `/platform` and `/admin` remain explicitly labeled interactive design demonstrations.
+      - Repository connections, GitHub integration, and autonomous agent execution are not yet implemented (scheduled for Phase 4.2).
+
 ---
 
 ## Supabase Authentication Setup & Configuration

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
 import { useAuth } from '../../contexts/AuthContext';
+import { getSafeRedirectPath } from '../../utils/redirect';
 
 export const SignInView: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { signIn, isConfigured, configError } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -55,8 +58,18 @@ export const SignInView: React.FC = () => {
       if (error) {
         setServerError(error.message || 'Invalid login credentials. Please try again.');
       } else {
-        // Redirect to Orbit homepage upon successful sign-in
-        navigate('/', { replace: true });
+        // Resolve intended destination: location.state.from or query params (?redirect= / ?from=)
+        const fromState = (location.state as any)?.from;
+        const fromTarget =
+          typeof fromState === 'object' && fromState?.pathname
+            ? `${fromState.pathname}${fromState.search || ''}`
+            : typeof fromState === 'string'
+            ? fromState
+            : searchParams.get('redirect') || searchParams.get('from');
+
+        // Validate destination to prevent open redirects; default to /workspace
+        const destination = getSafeRedirectPath(fromTarget, '/workspace');
+        navigate(destination, { replace: true });
       }
     } catch (err) {
       setServerError(err instanceof Error ? err.message : 'An unexpected error occurred during sign-in.');

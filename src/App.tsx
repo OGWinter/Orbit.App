@@ -13,6 +13,8 @@ import InquiryModal from './components/modals/InquiryModal';
 import QuickStartModal from './components/modals/QuickStartModal';
 import PlatformSandboxView from './components/views/PlatformSandboxView';
 import MissionControlView from './components/views/MissionControlView';
+import WorkspaceView from './components/views/WorkspaceView';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import SignInView from './components/auth/SignInView';
 import RegisterView from './components/auth/RegisterView';
 import ForgotPasswordView from './components/auth/ForgotPasswordView';
@@ -53,6 +55,11 @@ const AppContent: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const openWorkspace = () => {
+    navigate('/workspace');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const backToWebsite = () => {
     navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -72,6 +79,7 @@ const AppContent: React.FC = () => {
                 onOpenPlatformDemo={openPlatform}
                 onOpenQuickStart={() => setQuickStartOpen(true)}
                 onOpenSignIn={openSignIn}
+                onOpenWorkspace={openWorkspace}
                 isAdminView={false}
               />
               <main id="top">
@@ -123,6 +131,16 @@ const AppContent: React.FC = () => {
         <Route path="/forgot-password" element={<ForgotPasswordView />} />
         <Route path="/reset-password" element={<ResetPasswordView />} />
         <Route path="/invite" element={<InviteAcceptanceView />} />
+
+        {/* Phase 4.1: Authenticated Workspace Route */}
+        <Route
+          path="/workspace"
+          element={
+            <ProtectedRoute>
+              <WorkspaceView />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
