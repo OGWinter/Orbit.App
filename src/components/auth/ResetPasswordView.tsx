@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth, isRecoverySessionInvalidError } from '../../contexts/AuthContext';
 
 export const ResetPasswordView: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const { updatePassword, isConfigured, configError, isRecoverySession } = useAuth();
+  const { updatePassword, isConfigured, configError, isRecoverySession, clearRecoverySession } = useAuth();
 
   // Detect expired or invalid link from search params or hash fragment
   const isHashError =
@@ -21,6 +21,20 @@ export const ResetPasswordView: React.FC = () => {
   // Recovery authorization is strictly derived from Supabase Auth PASSWORD_RECOVERY event
   // URL parameters or hash contents must never unlock recovery authorization
   const isRecoveryAuthorized = isRecoverySession;
+
+  // Clear recovery authorization when leaving the reset flow (navigating away / unmounting)
+  useEffect(() => {
+    return () => {
+      clearRecoverySession();
+    };
+  }, [clearRecoverySession]);
+
+  // If the link is expired or invalid, clear recovery authorization immediately
+  useEffect(() => {
+    if (isLinkExpired) {
+      clearRecoverySession();
+    }
+  }, [isLinkExpired, clearRecoverySession]);
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -94,6 +108,10 @@ export const ResetPasswordView: React.FC = () => {
       const { error } = await updatePassword(newPassword);
 
       if (error) {
+        // If recovery session is invalidated or expired, clear authorization to return to required state
+        if (isRecoverySessionInvalidError(error)) {
+          clearRecoverySession();
+        }
         setServerError(
           error.message || 'Unable to update password. Your recovery link may be expired or already used.'
         );
@@ -103,9 +121,12 @@ export const ResetPasswordView: React.FC = () => {
         setConfirmPassword('');
       }
     } catch (err) {
-      setServerError(
-        err instanceof Error ? err.message : 'An unexpected error occurred while updating your password.'
-      );
+      const errorObj =
+        err instanceof Error ? err : new Error('An unexpected error occurred while updating your password.');
+      if (isRecoverySessionInvalidError(errorObj)) {
+        clearRecoverySession();
+      }
+      setServerError(errorObj.message);
     } finally {
       setSubmitting(false);
     }
@@ -114,7 +135,7 @@ export const ResetPasswordView: React.FC = () => {
   return (
     <AuthLayout
       headerRightAction={
-        <Link to="/login" className="auth-nav-link">
+        <Link to="/login" className="auth-nav-link" onClick={() => clearRecoverySession()}>
           ← Back to Sign In
         </Link>
       }
@@ -157,13 +178,20 @@ export const ResetPasswordView: React.FC = () => {
             </div>
 
             <div style={{ marginTop: '24px' }}>
-              <Link to="/forgot-password" className="auth-submit-btn" style={{ textDecoration: 'none' }}>
+              <Link
+                to="/forgot-password"
+                className="auth-submit-btn"
+                style={{ textDecoration: 'none' }}
+                onClick={() => clearRecoverySession()}
+              >
                 Request New Reset Link <span>→</span>
               </Link>
             </div>
 
             <div className="auth-footer-prompt">
-              <Link to="/login">Back to Sign In</Link>
+              <Link to="/login" onClick={() => clearRecoverySession()}>
+                Back to Sign In
+              </Link>
             </div>
           </div>
         ) : isSuccess ? (
@@ -201,7 +229,12 @@ export const ResetPasswordView: React.FC = () => {
             </div>
 
             <div style={{ marginTop: '24px' }}>
-              <Link to="/login" className="auth-submit-btn" style={{ textDecoration: 'none' }}>
+              <Link
+                to="/login"
+                className="auth-submit-btn"
+                style={{ textDecoration: 'none' }}
+                onClick={() => clearRecoverySession()}
+              >
                 Proceed to Sign In <span>→</span>
               </Link>
             </div>
@@ -236,20 +269,28 @@ export const ResetPasswordView: React.FC = () => {
               <div>
                 <strong>Recovery Session Missing:</strong>
                 <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
-                  To update your password, you must access this page via the secure recovery link dispatched to your verified email address. Direct access without valid recovery authorization is not permitted.
+                  {serverError ||
+                    'To update your password, you must access this page via the secure recovery link dispatched to your verified email address. Direct access without valid recovery authorization is not permitted.'}
                 </p>
               </div>
             </div>
 
             <div style={{ marginTop: '24px' }}>
-              <Link to="/forgot-password" className="auth-submit-btn" style={{ textDecoration: 'none' }}>
+              <Link
+                to="/forgot-password"
+                className="auth-submit-btn"
+                style={{ textDecoration: 'none' }}
+                onClick={() => clearRecoverySession()}
+              >
                 Request Password Reset Link <span>→</span>
               </Link>
             </div>
 
             <div className="auth-footer-prompt">
               Remember your password?
-              <Link to="/login">Sign in here</Link>
+              <Link to="/login" onClick={() => clearRecoverySession()}>
+                Sign in here
+              </Link>
             </div>
           </div>
         ) : (
@@ -411,7 +452,9 @@ export const ResetPasswordView: React.FC = () => {
 
             <div className="auth-footer-prompt">
               Remembered your existing password?
-              <Link to="/login">Sign In</Link>
+              <Link to="/login" onClick={() => clearRecoverySession()}>
+                Sign In
+              </Link>
             </div>
           </div>
         )}

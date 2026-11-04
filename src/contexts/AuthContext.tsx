@@ -1,6 +1,58 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import type { Session, User, AuthError } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured, getSupabaseConfigError } from '../services/supabase';
+
+/**
+ * Distinguishes invalid/expired/missing recovery sessions from ordinary transient or validation errors.
+ */
+export const isRecoverySessionInvalidError = (error: AuthError | Error | null): boolean => {
+  if (!error) return false;
+
+  const message = error.message ? error.message.toLowerCase() : '';
+  const status = 'status' in error && typeof (error as any).status === 'number' ? (error as any).status : 0;
+  const code = 'code' in error && typeof (error as any).code === 'string' ? (error as any).code.toLowerCase() : '';
+
+  const invalidSessionMessages = [
+    'session missing',
+    'session expired',
+    'token expired',
+    'invalid token',
+    'invalid jwt',
+    'jwt expired',
+    'user not found',
+    'sub claim',
+    'recovery link',
+    'recovery token',
+    'not authorized',
+    'unauthorized',
+    'session not found',
+    'auth session missing',
+    'recovery authorization required',
+  ];
+
+  const invalidSessionCodes = [
+    'session_not_found',
+    'user_not_found',
+    'token_expired',
+    'bad_jwt',
+    'invalid_token',
+    'session_expired',
+  ];
+
+  if (invalidSessionCodes.includes(code)) {
+    return true;
+  }
+
+  if (invalidSessionMessages.some((msg) => message.includes(msg))) {
+    return true;
+  }
+
+  if (status === 401 || status === 403) {
+    return true;
+  }
+
+  return false;
+};
 
 export interface AuthContextType {
   user: User | null;
@@ -257,23 +309,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       });
 
-      if (!error) {
+      if (error) {
+        // If the error indicates an invalid, missing, or expired recovery session, clear authorization
+        if (isRecoverySessionInvalidError(error)) {
+          isRecoveryRef.current = false;
+          setIsRecoverySession(false);
+        }
+        return { error };
+      }
+
+      isRecoveryRef.current = false;
+      setIsRecoverySession(false);
+      return { error: null };
+    } catch (err) {
+      const errorObj =
+        err instanceof Error ? err : new Error('An unexpected error occurred during password update.');
+      if (isRecoverySessionInvalidError(errorObj)) {
         isRecoveryRef.current = false;
         setIsRecoverySession(false);
       }
-
-      return { error };
-    } catch (err) {
       return {
-        error: err instanceof Error ? err : new Error('An unexpected error occurred during password update.'),
+        error: errorObj,
       };
     }
   };
 
-  const clearRecoverySession = () => {
+  const clearRecoverySession = useCallback(() => {
     isRecoveryRef.current = false;
     setIsRecoverySession(false);
-  };
+  }, []);
 
   const value: AuthContextType = {
     user,

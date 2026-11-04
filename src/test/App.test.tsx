@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import App from '../App';
 
@@ -7,8 +7,10 @@ describe('App Root Component', () => {
     window.history.pushState(null, '', '/');
   });
 
-  it('renders landing page sections by default', () => {
-    render(<App />);
+  it('renders landing page sections by default', async () => {
+    await act(async () => {
+      render(<App />);
+    });
 
     // Brand and headline
     expect(screen.getAllByText('orbit')[0]).toBeInTheDocument();
@@ -20,8 +22,10 @@ describe('App Root Component', () => {
     expect(screen.getByText(/Give your ideas/i)).toBeInTheDocument();
   });
 
-  it('opens and closes Waitlist modal from header CTA', () => {
-    render(<App />);
+  it('opens and closes Waitlist modal from header CTA', async () => {
+    await act(async () => {
+      render(<App />);
+    });
 
     const getStartedBtn = screen.getByRole('button', { name: /Get started/i });
     fireEvent.click(getStartedBtn);
@@ -34,8 +38,10 @@ describe('App Root Component', () => {
     expect(screen.queryByRole('heading', { name: /Join the Orbit Waitlist/i })).not.toBeInTheDocument();
   });
 
-  it('navigates to Platform Sandbox view when clicking Platform Sandbox', () => {
-    render(<App />);
+  it('navigates to Platform Sandbox view when clicking Platform Sandbox', async () => {
+    await act(async () => {
+      render(<App />);
+    });
 
     const sandboxBtns = screen.getAllByRole('button', { name: /Platform Sandbox/i });
     fireEvent.click(sandboxBtns[0]);
@@ -48,8 +54,10 @@ describe('App Root Component', () => {
     expect(screen.getByText(/Make room/i)).toBeInTheDocument();
   });
 
-  it('navigates to Mission Control view when clicking Mission Control', () => {
-    render(<App />);
+  it('navigates to Mission Control view when clicking Mission Control', async () => {
+    await act(async () => {
+      render(<App />);
+    });
 
     const adminBtns = screen.getAllByRole('button', { name: /Mission Control/i });
     fireEvent.click(adminBtns[0]);
