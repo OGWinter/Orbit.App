@@ -38,20 +38,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isRecoverySession, setIsRecoverySession] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash || '';
-      const search = window.location.search || '';
-      return (
-        hash.includes('type=recovery') ||
-        search.includes('type=recovery') ||
-        search.includes('recovery=true')
-      );
-    }
-    return false;
-  });
 
-  const isRecoveryRef = useRef<boolean>(isRecoverySession);
+  // Recovery authorization is strictly initialized to false.
+  // URL parameters or hash fragments must never grant authorization.
+  const [isRecoverySession, setIsRecoverySession] = useState<boolean>(false);
+  const isRecoveryRef = useRef<boolean>(false);
+
   useEffect(() => {
     isRecoveryRef.current = isRecoverySession;
   }, [isRecoverySession]);
@@ -67,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let isMounted = true;
 
-    // Fetch initial session
+    // Fetch initial session (generic session does NOT grant recovery authorization)
     supabase.auth
       .getSession()
       .then(({ data: { session: initialSession }, error }) => {
@@ -102,11 +94,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
-        // Supabase fires PASSWORD_RECOVERY when recovery link/token is processed
+        // ONLY authorize when Supabase itself emits PASSWORD_RECOVERY
         if (event === 'PASSWORD_RECOVERY') {
           isRecoveryRef.current = true;
           setIsRecoverySession(true);
-        } else if (event === 'SIGNED_OUT') {
+        } else if (event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
           isRecoveryRef.current = false;
           setIsRecoverySession(false);
         }
@@ -129,7 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!configured || !supabase) {
       return {
         error: new Error(
-          configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
+          configError ||
+            'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
         ),
       };
     }
@@ -167,7 +160,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!configured || !supabase) {
       return {
         error: new Error(
-          configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
+          configError ||
+            'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
         ),
       };
     }
@@ -187,7 +181,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async (): Promise<{ error: AuthError | Error | null }> => {
+    isRecoveryRef.current = false;
     setIsRecoverySession(false);
+
     if (!configured || !supabase) {
       setSession(null);
       setUser(null);
@@ -214,7 +210,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!configured || !supabase) {
       return {
         error: new Error(
-          configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
+          configError ||
+            'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
         ),
       };
     }
@@ -239,21 +236,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!configured || !supabase) {
       return {
         error: new Error(
-          configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
+          configError ||
+            'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
         ),
       };
     }
 
-    // Verify recovery authorization is present
-    const hasRecoveryUrl =
-      typeof window !== 'undefined' &&
-      (window.location.hash.includes('type=recovery') ||
-        window.location.search.includes('type=recovery') ||
-        window.location.search.includes('recovery=true'));
-
-    if (!isRecoverySession && !isRecoveryRef.current && !hasRecoveryUrl) {
+    // Strictly require verified PASSWORD_RECOVERY event
+    // Never allow generic sessions or URL parameters to bypass this check
+    if (!isRecoverySession && !isRecoveryRef.current) {
       return {
-        error: new Error('Recovery authorization required: You must access this page via a valid password recovery link.'),
+        error: new Error(
+          'Recovery authorization required: You must access this page via a valid password recovery event emitted by Supabase.'
+        ),
       };
     }
 
@@ -276,6 +271,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const clearRecoverySession = () => {
+    isRecoveryRef.current = false;
     setIsRecoverySession(false);
   };
 

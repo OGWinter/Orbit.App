@@ -125,7 +125,7 @@ Set the copied Supabase credentials:
 
 ```env
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your_key_placeholder
 ```
 
 *Note: If these variables are not configured or invalid, Orbit displays a clear configuration banner on all auth screens and prevents unconfigured requests.*

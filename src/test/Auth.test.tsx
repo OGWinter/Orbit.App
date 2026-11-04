@@ -8,7 +8,7 @@ import ResetPasswordView from '../components/auth/ResetPasswordView';
 import InviteAcceptanceView from '../components/auth/InviteAcceptanceView';
 import Header from '../components/layout/Header';
 import App from '../App';
-import { AuthProvider } from '../contexts/AuthContext';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
 
 // Mock Supabase service
 const mockSignUp = vi.fn();
@@ -60,7 +60,7 @@ const renderWithAuth = async (ui: React.ReactElement, initialEntries = ['/']) =>
   return view;
 };
 
-describe('Phase 3.1 — Supabase Auth Hardening & Configuration Fixes', () => {
+describe('Phase 3.2 — Supabase Recovery Security Fix & Verification', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockIsConfigured = true;
@@ -286,8 +286,8 @@ describe('Phase 3.1 — Supabase Auth Hardening & Configuration Fixes', () => {
     });
   });
 
-  describe('Hardened ResetPasswordView (/reset-password)', () => {
-    it('blocks direct access and shows authorization required state when no recovery session is active', async () => {
+  describe('Strict Supabase Recovery Authorization Enforcement', () => {
+    it('blocks direct access to /reset-password without a recovery session', async () => {
       await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
 
       expect(
@@ -304,6 +304,50 @@ describe('Phase 3.1 — Supabase Auth Hardening & Configuration Fixes', () => {
       expect(screen.queryByLabelText(/^New Password$/i)).not.toBeInTheDocument();
     });
 
+    it('blocks access when URL contains ?type=recovery without a genuine Supabase recovery event', async () => {
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password?type=recovery']);
+
+      // Form MUST NOT be unlocked by URL parameter
+      expect(
+        screen.getByRole('heading', { name: /Password reset authorization required/i })
+      ).toBeInTheDocument();
+      expect(screen.queryByLabelText(/^New Password$/i)).not.toBeInTheDocument();
+    });
+
+    it('blocks access when URL contains ?recovery=true without a genuine recovery event', async () => {
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password?recovery=true']);
+
+      // Form MUST NOT be unlocked by URL parameter
+      expect(
+        screen.getByRole('heading', { name: /Password reset authorization required/i })
+      ).toBeInTheDocument();
+      expect(screen.queryByLabelText(/^New Password$/i)).not.toBeInTheDocument();
+    });
+
+    it('ensures a generic authenticated session does not authorize password updates', async () => {
+      // Simulate generic logged-in user without PASSWORD_RECOVERY event
+      mockGetSession.mockResolvedValueOnce({
+        data: {
+          session: {
+            user: { id: 'u-normal', email: 'normal@orbit.dev' },
+            access_token: 'normal-token',
+            refresh_token: 'normal-refresh',
+            expires_in: 3600,
+            token_type: 'bearer',
+          },
+        },
+        error: null,
+      });
+
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
+
+      // Generic session does NOT unlock password reset
+      expect(
+        screen.getByRole('heading', { name: /Password reset authorization required/i })
+      ).toBeInTheDocument();
+      expect(screen.queryByLabelText(/^New Password$/i)).not.toBeInTheDocument();
+    });
+
     it('renders expired view when ?expired=true or ?token=invalid is provided', async () => {
       await renderWithAuth(<ResetPasswordView />, ['/reset-password?expired=true']);
 
@@ -312,52 +356,7 @@ describe('Phase 3.1 — Supabase Auth Hardening & Configuration Fixes', () => {
       expect(screen.queryByLabelText(/^New Password$/i)).not.toBeInTheDocument();
     });
 
-    it('unlocks password reset form and submits update when valid recovery authorization is established', async () => {
-      mockUpdateUser.mockResolvedValueOnce({
-        data: { user: { id: 'user-1' } },
-        error: null,
-      });
-
-      // Accessible with recovery authorization parameter
-      await renderWithAuth(<ResetPasswordView />, ['/reset-password?type=recovery']);
-
-      expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
-
-      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'BrandNewPass2026!' } });
-      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'BrandNewPass2026!' } });
-
-      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
-
-      await waitFor(() => {
-        expect(mockUpdateUser).toHaveBeenCalledWith({
-          password: 'BrandNewPass2026!',
-        });
-        expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
-        expect(screen.getByText(/Your Orbit account password has been updated successfully via Supabase Auth/i)).toBeInTheDocument();
-      });
-    });
-
-    it('displays error and does not report false success when password update fails', async () => {
-      mockUpdateUser.mockResolvedValueOnce({
-        data: { user: null },
-        error: { message: 'Auth session missing or token expired' },
-      });
-
-      await renderWithAuth(<ResetPasswordView />, ['/reset-password?type=recovery']);
-
-      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'BrandNewPass2026!' } });
-      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'BrandNewPass2026!' } });
-
-      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText(/Auth session missing or token expired/i)).toBeInTheDocument();
-      });
-
-      expect(screen.queryByRole('heading', { name: /Password updated/i })).not.toBeInTheDocument();
-    });
-
-    it('authorizes password update when PASSWORD_RECOVERY event is triggered by Supabase SDK', async () => {
+    it('unlocks password reset form and allows update ONLY when genuine PASSWORD_RECOVERY event is emitted', async () => {
       let authCallback: any;
       mockOnAuthStateChange.mockImplementationOnce((callback) => {
         authCallback = callback;
@@ -375,15 +374,67 @@ describe('Phase 3.1 — Supabase Auth Hardening & Configuration Fixes', () => {
         error: null,
       });
 
-      // Initial load without recovery params
+      // Initial load without recovery event
       await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
 
-      // Initially blocked
       expect(
         screen.getByRole('heading', { name: /Password reset authorization required/i })
       ).toBeInTheDocument();
 
-      // Supabase fires PASSWORD_RECOVERY event
+      // Supabase Auth itself emits PASSWORD_RECOVERY event
+      await act(async () => {
+        if (authCallback) {
+          authCallback('PASSWORD_RECOVERY', {
+            user: { id: 'u-recovery', email: 'dev@company.com' },
+            access_token: 'genuine-rec-tok',
+          });
+        }
+      });
+
+      // Form is now unlocked
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
+      });
+
+      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'VerifiedRecovery2026!' } });
+      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'VerifiedRecovery2026!' } });
+      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
+
+      await waitFor(() => {
+        expect(mockUpdateUser).toHaveBeenCalledWith({
+          password: 'VerifiedRecovery2026!',
+        });
+        expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
+      });
+    });
+
+    it('clears recovery authorization after successful password update', async () => {
+      let authCallback: any;
+      mockOnAuthStateChange.mockImplementationOnce((callback) => {
+        authCallback = callback;
+        return {
+          data: {
+            subscription: {
+              unsubscribe: vi.fn(),
+            },
+          },
+        };
+      });
+
+      mockUpdateUser.mockResolvedValueOnce({
+        data: { user: { id: 'u-recovery' } },
+        error: null,
+      });
+
+      let authHook: any;
+      const TestConsumer = () => {
+        authHook = useAuth();
+        return <ResetPasswordView />;
+      };
+
+      await renderWithAuth(<TestConsumer />, ['/reset-password']);
+
+      // Emit PASSWORD_RECOVERY
       await act(async () => {
         if (authCallback) {
           authCallback('PASSWORD_RECOVERY', {
@@ -393,21 +444,113 @@ describe('Phase 3.1 — Supabase Auth Hardening & Configuration Fixes', () => {
         }
       });
 
-      // Password form is now unlocked
+      expect(authHook.isRecoverySession).toBe(true);
+
+      // Submit password update
+      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'VerifiedRecovery2026!' } });
+      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'VerifiedRecovery2026!' } });
+      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
+      });
+
+      // Recovery authorization MUST be cleared
+      expect(authHook.isRecoverySession).toBe(false);
+
+      // Calling updatePassword again directly without recovery authorization is blocked
+      const result = await authHook.updatePassword('AnotherPassword2026!');
+      expect(result.error).not.toBeNull();
+      expect(result.error?.message).toMatch(/Recovery authorization required/i);
+    });
+
+    it('clears recovery authorization on sign-out', async () => {
+      let authCallback: any;
+      mockOnAuthStateChange.mockImplementationOnce((callback) => {
+        authCallback = callback;
+        return {
+          data: {
+            subscription: {
+              unsubscribe: vi.fn(),
+            },
+          },
+        };
+      });
+
+      mockSignOut.mockResolvedValueOnce({ error: null });
+
+      let authHook: any;
+      const TestConsumer = () => {
+        authHook = useAuth();
+        return <div>Test</div>;
+      };
+
+      await renderWithAuth(<TestConsumer />);
+
+      // Emit PASSWORD_RECOVERY
+      await act(async () => {
+        if (authCallback) {
+          authCallback('PASSWORD_RECOVERY', {
+            user: { id: 'u-recovery', email: 'dev@company.com' },
+            access_token: 'rec-tok',
+          });
+        }
+      });
+
+      expect(authHook.isRecoverySession).toBe(true);
+
+      // Sign out
+      await act(async () => {
+        await authHook.signOut();
+      });
+
+      // Authorization cleared
+      expect(authHook.isRecoverySession).toBe(false);
+    });
+
+    it('displays error and does not report false success when password update fails', async () => {
+      let authCallback: any;
+      mockOnAuthStateChange.mockImplementationOnce((callback) => {
+        authCallback = callback;
+        return {
+          data: {
+            subscription: {
+              unsubscribe: vi.fn(),
+            },
+          },
+        };
+      });
+
+      mockUpdateUser.mockResolvedValueOnce({
+        data: { user: null },
+        error: { message: 'Auth session missing or token expired' },
+      });
+
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
+
+      // Emit PASSWORD_RECOVERY
+      await act(async () => {
+        if (authCallback) {
+          authCallback('PASSWORD_RECOVERY', {
+            user: { id: 'u-recovery', email: 'dev@company.com' },
+            access_token: 'rec-tok',
+          });
+        }
+      });
+
       await waitFor(() => {
         expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
       });
 
-      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'ValidRecovery2026!' } });
-      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'ValidRecovery2026!' } });
+      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'BrandNewPass2026!' } });
+      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'BrandNewPass2026!' } });
       fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
 
       await waitFor(() => {
-        expect(mockUpdateUser).toHaveBeenCalledWith({
-          password: 'ValidRecovery2026!',
-        });
-        expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
+        expect(screen.getByText(/Auth session missing or token expired/i)).toBeInTheDocument();
       });
+
+      expect(screen.queryByRole('heading', { name: /Password updated/i })).not.toBeInTheDocument();
     });
   });
 

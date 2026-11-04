@@ -18,14 +18,9 @@ export const ResetPasswordView: React.FC = () => {
     searchParams.get('error') !== null ||
     isHashError;
 
-  // Determine if recovery authorization has been established
-  const isRecoveryFromUrl =
-    typeof window !== 'undefined' &&
-    (window.location.hash.includes('type=recovery') ||
-      searchParams.get('type') === 'recovery' ||
-      searchParams.get('recovery') === 'true');
-
-  const isRecoveryAuthorized = isRecoverySession || isRecoveryFromUrl;
+  // Recovery authorization is strictly derived from Supabase Auth PASSWORD_RECOVERY event
+  // URL parameters or hash contents must never unlock recovery authorization
+  const isRecoveryAuthorized = isRecoverySession;
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
