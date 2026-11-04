@@ -1,28 +1,68 @@
 /* ==========================================================================
-   ORBIT V2 — AUTHENTICATED WORKSPACE STYLES (PHASE 4.1)
+   ORBIT V2 — AUTHENTICATED WORKSPACE STYLES (PHASE 4.1.2)
+   Design System: ORBIT — PRECISION & MOMENTUM
+   Palette:
+     Main background:       #F3F4EF (warm porcelain)
+     Primary surfaces:      #FFFFFF
+     Primary text:          #172536 (midnight ink)
+     Secondary text:        #647386
+     Primary brand:         #315CE8 (electric cobalt)
+     Brand highlight:       #D6ED83 (Orbit lime)
+     Borders:               #E1E6E8
+     Soft blue surface:     #DFE6F2
+     Soft green surface:    #DCEDE5
+     Soft warm surface:     #F6E6D9
+     Dark surfaces:         #172536
+   ========================================================================== */
+
+:root {
+  --orbit-bg-main: #F3F4EF;
+  --orbit-surface-primary: #FFFFFF;
+  --orbit-text-primary: #172536;
+  --orbit-text-secondary: #647386;
+  --orbit-brand-primary: #315CE8;
+  --orbit-brand-highlight: #D6ED83;
+  --orbit-border: #E1E6E8;
+  --orbit-surface-soft-blue: #DFE6F2;
+  --orbit-surface-soft-green: #DCEDE5;
+  --orbit-surface-soft-warm: #F6E6D9;
+  --orbit-surface-dark: #172536;
+  --orbit-surface-dark-hover: #1e3046;
+  --orbit-surface-dark-border: rgba(255, 255, 255, 0.08);
+  --orbit-surface-dark-muted: #8e9bae;
+  --orbit-radius-sm: 6px;
+  --orbit-radius-md: 10px;
+  --orbit-radius-lg: 14px;
+}
+
+/* ==========================================================================
+   Shell & Base Layout
    ========================================================================== */
 
 .workspace-shell {
   display: flex;
   min-height: 100vh;
-  background-color: #0d0e14;
-  color: #f8fafc;
+  background-color: var(--orbit-bg-main);
+  color: var(--orbit-text-primary);
   font-family: var(--font-body, 'DM Sans', -apple-system, sans-serif);
   position: relative;
   overflow-x: hidden;
 }
 
-/* Mobile Topbar (Shown only on small screens) */
+/* Mobile Bar (Shown only on small screens) */
 .workspace-mobile-bar {
   display: none;
 }
 
-/* Sidebar */
+/* ==========================================================================
+   Sidebar (Dark Navy #172536)
+   ========================================================================== */
+
 .workspace-sidebar {
-  width: 260px;
-  min-width: 260px;
-  background: #12131c;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  width: 268px;
+  min-width: 268px;
+  background: var(--orbit-surface-dark);
+  border-right: 1px solid var(--orbit-surface-dark-border);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -32,19 +72,20 @@
 }
 
 .workspace-brand {
-  padding: 24px;
+  padding: 24px 20px;
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  color: #f8fafc;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #FFFFFF;
+  border-bottom: 1px solid var(--orbit-surface-dark-border);
 }
 
 .workspace-brand .brand-mark {
-  color: var(--violet, #7564f5);
+  color: var(--orbit-brand-primary);
   display: grid;
   place-items: center;
+  flex-shrink: 0;
 }
 
 .workspace-brand .brand-name {
@@ -52,17 +93,17 @@
   font-weight: 700;
   font-size: 20px;
   letter-spacing: -0.04em;
-  color: #f8fafc;
+  color: #FFFFFF;
 }
 
 .workspace-badge {
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  background: rgba(117, 100, 245, 0.15);
-  border: 1px solid rgba(117, 100, 245, 0.3);
-  color: #c4b5fd;
+  background: rgba(49, 92, 232, 0.2);
+  border: 1px solid rgba(49, 92, 232, 0.4);
+  color: var(--orbit-brand-highlight);
   padding: 2px 7px;
   border-radius: 999px;
   margin-left: auto;
@@ -70,7 +111,7 @@
 
 /* Sidebar Navigation */
 .workspace-nav {
-  padding: 16px 12px;
+  padding: 20px 14px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -82,8 +123,8 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #64748b;
-  padding: 8px 12px 4px;
+  color: var(--orbit-surface-dark-muted);
+  padding: 8px 10px 4px;
   margin-top: 4px;
 }
 
@@ -91,33 +132,44 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  border-radius: 8px;
+  padding: 9px 12px;
+  border-radius: var(--orbit-radius-sm);
   background: transparent;
   border: 1px solid transparent;
-  color: #94a3b8;
+  color: var(--orbit-surface-dark-muted);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
   transition: all 0.15s ease;
   width: 100%;
 }
 
 .workspace-nav-item:hover:not(.is-disabled) {
-  background: rgba(255, 255, 255, 0.04);
-  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
 }
 
 .workspace-nav-item.active {
-  background: rgba(117, 100, 245, 0.14);
-  color: #c4b5fd;
-  border-color: rgba(117, 100, 245, 0.28);
+  background: rgba(49, 92, 232, 0.16);
+  color: #FFFFFF;
+  border-color: rgba(49, 92, 232, 0.4);
+  position: relative;
+}
+
+.workspace-nav-item.active .nav-item-icon {
+  color: var(--orbit-brand-highlight);
 }
 
 .workspace-nav-item.is-disabled {
-  opacity: 0.55;
+  opacity: 0.45;
   cursor: not-allowed;
+}
+
+.nav-item-icon {
+  flex-shrink: 0;
+  color: inherit;
 }
 
 .coming-soon-badge {
@@ -126,22 +178,41 @@
   padding: 2px 7px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--orbit-surface-dark-muted);
   margin-left: auto;
+}
+
+.preview-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-left: auto;
+}
+
+.preview-badge-platform {
+  background: var(--orbit-surface-soft-green);
+  color: var(--orbit-text-primary);
+}
+
+.preview-badge-admin {
+  background: var(--orbit-surface-soft-warm);
+  color: var(--orbit-text-primary);
 }
 
 /* Sidebar User Footer */
 .workspace-user-section {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--orbit-surface-dark-border);
   display: flex;
   flex-direction: column;
 }
 
 .workspace-signout-error {
-  padding: 8px 12px;
-  background: rgba(239, 68, 68, 0.12);
-  border-bottom: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 8px 14px;
+  background: rgba(239, 68, 68, 0.15);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
   font-size: 11px;
   display: flex;
@@ -154,21 +225,22 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .workspace-avatar {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1, #4338ca);
-  color: #ffffff;
+  background: var(--orbit-brand-primary);
+  border: 2px solid rgba(214, 237, 131, 0.4);
+  color: #FFFFFF;
   display: grid;
   place-items: center;
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
   font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
   flex-shrink: 0;
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.35);
 }
 
 .workspace-user-info {
@@ -180,7 +252,7 @@
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #f8fafc;
+  color: #FFFFFF;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -189,7 +261,7 @@
 .workspace-user-email {
   display: block;
   font-size: 11px;
-  color: #64748b;
+  color: var(--orbit-surface-dark-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -197,31 +269,50 @@
 
 .workspace-signout-btn {
   background: transparent;
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--orbit-radius-sm);
   padding: 5px 9px;
-  color: #f87171;
+  color: var(--orbit-surface-soft-blue);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .workspace-signout-btn:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
 }
 
 .workspace-signout-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Workspace Alert Banner */
+/* ==========================================================================
+   Main Workspace Content (Warm Porcelain #F3F4EF)
+   ========================================================================== */
+
+.workspace-main-content {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 48px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  overflow-y: auto;
+  max-width: 1320px;
+}
+
+/* Workspace Alert Banner (Top of Content) */
 .workspace-alert-banner {
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 12px 18px;
+  border-radius: var(--orbit-radius-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -231,20 +322,21 @@
 }
 
 .workspace-alert-banner.error {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  color: #b91c1c;
 }
 
 .workspace-alert-dismiss {
   background: transparent;
   border: none;
-  color: #fca5a5;
-  font-size: 14px;
+  color: inherit;
   cursor: pointer;
   padding: 4px;
-  line-height: 1;
-  opacity: 0.75;
+  display: grid;
+  place-items: center;
+  opacity: 0.7;
+  border-radius: 4px;
   transition: opacity 0.15s ease;
 }
 
@@ -252,25 +344,41 @@
   opacity: 1;
 }
 
-/* Main Content Area */
-.workspace-main-content {
-  flex: 1;
-  min-width: 0;
-  padding: 32px 40px 60px;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  overflow-y: auto;
-}
+/* ==========================================================================
+   Workspace Topbar
+   ========================================================================== */
 
-/* Topbar */
 .workspace-topbar {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--orbit-border);
+}
+
+.workspace-topbar-title-group {
+  min-width: 0;
+}
+
+.workspace-breadcrumb {
+  display: flex;
   align-items: center;
-  gap: 16px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orbit-text-secondary);
+  margin-bottom: 6px;
+}
+
+.workspace-breadcrumb .breadcrumb-separator {
+  color: #A0AEC0;
+}
+
+.workspace-breadcrumb .breadcrumb-current {
+  color: var(--orbit-brand-primary);
 }
 
 .workspace-topbar h1 {
@@ -279,69 +387,95 @@
   font-weight: 700;
   letter-spacing: -0.03em;
   margin: 0;
-  color: #f8fafc;
+  color: var(--orbit-text-primary);
+  line-height: 1.2;
+}
+
+.workspace-topbar-subtitle {
+  margin: 4px 0 0;
+  color: var(--orbit-text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .workspace-topbar-actions {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+}
+
+.workspace-session-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--orbit-surface-soft-green);
+  border: 1px solid #c2e2d3;
+  color: var(--orbit-text-primary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.workspace-session-pill .session-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
 }
 
 .workspace-external-link {
   font-size: 12px;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--orbit-text-primary);
   text-decoration: none;
   padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--orbit-radius-sm);
+  border: 1px solid var(--orbit-border);
+  background: var(--orbit-surface-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   transition: all 0.15s ease;
 }
 
 .workspace-external-link:hover {
-  color: #f8fafc;
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--orbit-brand-primary);
+  color: var(--orbit-brand-primary);
+  box-shadow: 0 1px 4px rgba(49, 92, 232, 0.08);
 }
 
-/* Welcome Banner */
+/* ==========================================================================
+   Welcome Section (Precision & Momentum Art Direction)
+   ========================================================================== */
+
 .workspace-welcome-banner {
-  background: radial-gradient(ellipse 80% 120% at 90% 0%, rgba(117, 100, 245, 0.14) 0%, rgba(18, 19, 28, 0.95) 75%);
-  border: 1px solid rgba(117, 100, 245, 0.22);
-  border-radius: 16px;
+  background: var(--orbit-surface-primary);
+  border: 1px solid var(--orbit-border);
+  border-radius: var(--orbit-radius-lg);
   padding: 28px 32px;
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  box-shadow: 0 1px 3px rgba(23, 37, 54, 0.04);
 }
 
-.workspace-welcome-banner h2 {
-  font-family: var(--font-display, 'Space Grotesk', sans-serif);
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  margin: 0 0 8px;
-  color: #f8fafc;
-}
-
-.workspace-welcome-banner p {
-  color: #94a3b8;
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0;
-  max-width: 680px;
+.welcome-banner-content {
+  flex: 1;
+  min-width: 0;
 }
 
 .workspace-status-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  color: #6ee7b7;
+  background: var(--orbit-surface-soft-green);
+  border: 1px solid #c2e2d3;
+  color: var(--orbit-text-primary);
   font-size: 11px;
   font-weight: 600;
   margin-bottom: 12px;
@@ -352,10 +486,49 @@
   height: 6px;
   border-radius: 50%;
   background: #10b981;
-  box-shadow: 0 0 6px #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }
 
-/* Section Containers */
+.workspace-welcome-banner h2 {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin: 0 0 8px;
+  color: var(--orbit-text-primary);
+}
+
+.workspace-welcome-banner p {
+  color: var(--orbit-text-secondary);
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 640px;
+}
+
+.workspace-welcome-banner p strong {
+  color: var(--orbit-text-primary);
+  font-weight: 600;
+}
+
+.welcome-banner-visual {
+  flex-shrink: 0;
+  width: 220px;
+  height: 130px;
+  display: grid;
+  place-items: center;
+}
+
+.welcome-orbital-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ==========================================================================
+   Section Containers
+   ========================================================================== */
+
 .workspace-section {
   display: flex;
   flex-direction: column;
@@ -371,55 +544,61 @@
 
 .workspace-section-header h3 {
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 4px;
-  color: #f8fafc;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 2px;
+  color: var(--orbit-text-primary);
 }
 
 .workspace-section-header p {
-  color: #64748b;
+  color: var(--orbit-text-secondary);
   font-size: 13px;
   margin: 0;
 }
 
-/* Projects Empty State Card */
+/* ==========================================================================
+   Projects Area (Connected Projects — Intentional First-Run Experience)
+   ========================================================================== */
+
 .workspace-empty-card {
-  background: #14151e;
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  padding: 44px 28px;
+  background: var(--orbit-surface-primary);
+  border: 1px solid var(--orbit-border);
+  border-radius: var(--orbit-radius-lg);
+  padding: 44px 32px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  box-shadow: 0 1px 3px rgba(23, 37, 54, 0.04);
 }
 
-.workspace-empty-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: rgba(117, 100, 245, 0.1);
-  border: 1px solid rgba(117, 100, 245, 0.2);
-  color: var(--violet, #7564f5);
+.workspace-empty-illustration {
+  width: 120px;
+  height: 80px;
   display: grid;
   place-items: center;
-  font-size: 22px;
   margin-bottom: 4px;
+}
+
+.empty-schematic-svg {
+  width: 100%;
+  height: 100%;
 }
 
 .workspace-empty-card h4 {
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
+  letter-spacing: -0.015em;
   margin: 0;
-  color: #f1f5f9;
+  color: var(--orbit-text-primary);
 }
 
 .workspace-empty-card p {
   max-width: 520px;
-  color: #64748b;
+  color: var(--orbit-text-secondary);
   font-size: 13px;
   line-height: 1.6;
   margin: 0;
@@ -430,30 +609,33 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 16px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
+  padding: 8px 14px;
+  border-radius: var(--orbit-radius-sm);
+  background: var(--orbit-bg-main);
+  border: 1px solid var(--orbit-border);
+  color: var(--orbit-text-secondary);
   font-size: 12px;
   font-weight: 600;
   cursor: not-allowed;
+  transition: all 0.15s ease;
 }
 
 .workspace-empty-action .coming-soon-pill {
   font-size: 9px;
-  padding: 1px 6px;
+  font-weight: 700;
+  padding: 2px 7px;
   border-radius: 999px;
-  background: rgba(117, 100, 245, 0.18);
-  color: #c4b5fd;
-  border: 1px solid rgba(117, 100, 245, 0.3);
+  background: var(--orbit-surface-soft-blue);
+  color: var(--orbit-brand-primary);
+  border: 1px solid #ccd7ec;
 }
 
-/* Empty Stats Row (Truthful 0 counts) */
+/* Truthful Stats Row (0 counts) */
 .workspace-stats-row {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  justify-content: center;
   margin-top: 14px;
 }
 
@@ -463,109 +645,242 @@
   gap: 6px;
   font-size: 11px;
   font-weight: 600;
-  color: #64748b;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--orbit-text-secondary);
+  background: var(--orbit-bg-main);
+  padding: 6px 12px;
+  border-radius: var(--orbit-radius-sm);
+  border: 1px solid var(--orbit-border);
 }
 
-.workspace-stat-pill strong {
-  color: #94a3b8;
-}
+/* ==========================================================================
+   Getting Started Onboarding Section
+   ========================================================================== */
 
-/* Getting Started Guides Grid */
 .workspace-guide-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
 .workspace-guide-card {
-  background: #14151e;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  background: var(--orbit-surface-primary);
+  border: 1px solid var(--orbit-border);
+  border-radius: var(--orbit-radius-md);
   padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(23, 37, 54, 0.04);
 }
 
-.workspace-guide-card .guide-step-tag {
+.guide-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.guide-step-tag {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--violet, #7564f5);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.guide-tag-live {
+  background: var(--orbit-surface-soft-green);
+  color: var(--orbit-text-primary);
+  border: 1px solid #c2e2d3;
+}
+
+.guide-tag-preview {
+  background: var(--orbit-surface-soft-blue);
+  color: var(--orbit-brand-primary);
+  border: 1px solid #ccd7ec;
+}
+
+.guide-tag-upcoming {
+  background: var(--orbit-surface-soft-warm);
+  color: var(--orbit-text-primary);
+  border: 1px solid #edd5c2;
+}
+
+.guide-icon-wrapper {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.guide-icon-live {
+  background: var(--orbit-surface-soft-green);
+  color: #10b981;
+}
+
+.guide-icon-preview {
+  background: var(--orbit-surface-soft-blue);
+  color: var(--orbit-brand-primary);
+}
+
+.guide-icon-upcoming {
+  background: var(--orbit-surface-soft-warm);
+  color: #b45309;
 }
 
 .workspace-guide-card h4 {
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
   font-size: 15px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   margin: 0;
-  color: #f1f5f9;
+  color: var(--orbit-text-primary);
 }
 
 .workspace-guide-card p {
-  color: #64748b;
-  font-size: 12px;
+  color: var(--orbit-text-secondary);
+  font-size: 12.5px;
   line-height: 1.6;
   margin: 0;
 }
 
-/* Architecture Notice Banner */
+.guide-card-links {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.guide-link {
+  color: var(--orbit-brand-primary);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: color 0.15s ease;
+}
+
+.guide-link:hover {
+  text-decoration: underline;
+}
+
+.guide-link-dot {
+  color: #CBD5E1;
+}
+
+/* ==========================================================================
+   Architecture Notice Banner
+   ========================================================================== */
+
 .workspace-notice-box {
-  background: rgba(117, 100, 245, 0.08);
-  border: 1px solid rgba(117, 100, 245, 0.2);
-  border-radius: 10px;
-  padding: 14px 18px;
+  background: var(--orbit-surface-primary);
+  border: 1px solid var(--orbit-border);
+  border-left: 3px solid var(--orbit-brand-primary);
+  border-radius: var(--orbit-radius-md);
+  padding: 16px 20px;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  color: #c4b5fd;
-  font-size: 12px;
-  line-height: 1.5;
+  gap: 14px;
+  color: var(--orbit-text-secondary);
+  font-size: 12.5px;
+  line-height: 1.55;
+  box-shadow: 0 1px 3px rgba(23, 37, 54, 0.04);
+}
+
+.notice-icon-wrapper {
+  color: var(--orbit-brand-primary);
+  margin-top: 1px;
+  flex-shrink: 0;
 }
 
 .workspace-notice-box strong {
-  color: #e0e7ff;
+  color: var(--orbit-text-primary);
+  font-weight: 600;
+  display: inline;
+  margin-right: 4px;
 }
 
-/* Loading & Error Screens */
+.workspace-notice-box p {
+  margin: 0;
+  display: inline;
+}
+
+/* ==========================================================================
+   Loading & Error Screens (Coherent with Precision & Momentum)
+   ========================================================================== */
+
 .workspace-loading-screen {
   min-height: 100vh;
-  background-color: #0d0e14;
-  color: #f8fafc;
+  background-color: var(--orbit-bg-main);
+  color: var(--orbit-text-primary);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 16px;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
 }
 
 .workspace-loading-spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid rgba(117, 100, 245, 0.2);
-  border-top-color: var(--violet, #7564f5);
+  border: 3px solid var(--orbit-border);
+  border-top-color: var(--orbit-brand-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 .workspace-config-error {
   min-height: 100vh;
-  background-color: #0d0e14;
+  background-color: var(--orbit-bg-main);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
 }
 
-/* Responsive Media Queries */
+/* ==========================================================================
+   Keyboard Focus & Accessibility
+   ========================================================================== */
+
+.workspace-nav-item:focus-visible,
+.workspace-signout-btn:focus-visible,
+.workspace-external-link:focus-visible,
+.workspace-alert-dismiss:focus-visible,
+.workspace-mobile-toggle:focus-visible {
+  outline: 2px solid var(--orbit-brand-primary);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+@media (max-width: 1080px) {
+  .workspace-guide-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .workspace-main-content {
-    padding: 24px 20px 40px;
+    padding: 24px 20px 48px;
+  }
+
+  .workspace-welcome-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .welcome-banner-visual {
+    width: 100%;
+    height: 110px;
   }
 }
 
@@ -580,8 +895,8 @@
     justify-content: space-between;
     padding: 0 16px;
     height: 60px;
-    background: #12131c;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--orbit-surface-dark);
+    border-bottom: 1px solid var(--orbit-surface-dark-border);
     position: sticky;
     top: 0;
     z-index: 40;
@@ -589,11 +904,12 @@
 
   .workspace-mobile-toggle {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 6px;
-    padding: 6px 10px;
-    color: #f8fafc;
-    font-size: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--orbit-radius-sm);
+    padding: 6px 8px;
+    color: #FFFFFF;
+    display: grid;
+    place-items: center;
     cursor: pointer;
   }
 
@@ -603,8 +919,8 @@
     bottom: 0;
     left: 0;
     width: 280px;
-    max-width: 80vw;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    max-width: 82vw;
+    box-shadow: 12px 0 36px rgba(0, 0, 0, 0.4);
     transform: translateX(-100%);
   }
 
@@ -618,7 +934,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(23, 37, 54, 0.5);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 25;
@@ -635,6 +951,11 @@
     gap: 12px;
   }
 
+  .workspace-topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .workspace-welcome-banner {
     padding: 20px;
   }
@@ -643,8 +964,18 @@
     font-size: 20px;
   }
 
-  .workspace-guide-grid {
-    grid-template-columns: 1fr;
+  .workspace-empty-card {
+    padding: 32px 20px;
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .workspace-sidebar,
+  .workspace-nav-item,
+  .workspace-signout-btn,
+  .workspace-external-link,
+  .workspace-loading-spinner {
+    transition: none !important;
+    animation: none !important;
+  }
+}

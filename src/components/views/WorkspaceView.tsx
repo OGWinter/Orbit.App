@@ -1,5 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  FolderGit2,
+  Activity,
+  FlaskConical,
+  Radio,
+  LogOut,
+  ArrowUpRight,
+  ShieldCheck,
+  Shield,
+  GitBranch,
+  AlertCircle,
+  X,
+  Menu,
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const WorkspaceView: React.FC = () => {
@@ -51,7 +66,7 @@ export const WorkspaceView: React.FC = () => {
       {/* Mobile Topbar */}
       <div className="workspace-mobile-bar">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="brand-mark" aria-hidden="true" style={{ color: 'var(--violet, #7564f5)' }}>
+          <span className="brand-mark" aria-hidden="true" style={{ color: 'var(--orbit-brand-primary, #315CE8)' }}>
             <svg viewBox="0 0 36 36" fill="none" width="24" height="24">
               <circle cx="18" cy="18" r="12.5" stroke="currentColor" strokeWidth="1.7" />
               <ellipse
@@ -63,10 +78,12 @@ export const WorkspaceView: React.FC = () => {
                 stroke="currentColor"
                 strokeWidth="1.7"
               />
-              <circle cx="29.4" cy="8.2" r="2.6" fill="currentColor" />
+              <circle cx="29.4" cy="8.2" r="2.6" fill="var(--orbit-brand-highlight, #D6ED83)" />
             </svg>
           </span>
-          <span style={{ fontWeight: 700, fontSize: '18px', fontFamily: 'var(--font-display)' }}>orbit</span>
+          <span style={{ fontWeight: 700, fontSize: '18px', fontFamily: 'var(--font-display, "Space Grotesk")' }}>
+            orbit
+          </span>
           <span className="workspace-badge">WORKSPACE</span>
         </div>
         <button
@@ -76,7 +93,7 @@ export const WorkspaceView: React.FC = () => {
           aria-expanded={mobileMenuOpen}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? '✕' : '☰'}
+          {mobileMenuOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
         </button>
       </div>
 
@@ -107,7 +124,7 @@ export const WorkspaceView: React.FC = () => {
                 stroke="currentColor"
                 strokeWidth="1.7"
               />
-              <circle cx="29.4" cy="8.2" r="2.6" fill="currentColor" />
+              <circle cx="29.4" cy="8.2" r="2.6" fill="var(--orbit-brand-highlight, #D6ED83)" />
             </svg>
           </span>
           <span className="brand-name">orbit</span>
@@ -124,7 +141,7 @@ export const WorkspaceView: React.FC = () => {
             aria-current="page"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <span aria-hidden="true">📊</span>
+            <LayoutDashboard size={16} strokeWidth={2} className="nav-item-icon" aria-hidden="true" />
             <span>Overview</span>
           </button>
 
@@ -135,7 +152,7 @@ export const WorkspaceView: React.FC = () => {
             aria-disabled="true"
             title="Projects and repository connection are coming in Phase 4.2"
           >
-            <span aria-hidden="true">📁</span>
+            <FolderGit2 size={16} strokeWidth={2} className="nav-item-icon" aria-hidden="true" />
             <span>Projects</span>
             <span className="coming-soon-badge">Coming soon</span>
           </button>
@@ -147,7 +164,7 @@ export const WorkspaceView: React.FC = () => {
             aria-disabled="true"
             title="Activity logging will be available in an upcoming update"
           >
-            <span aria-hidden="true">⚡</span>
+            <Activity size={16} strokeWidth={2} className="nav-item-icon" aria-hidden="true" />
             <span>Activity</span>
             <span className="coming-soon-badge">Coming soon</span>
           </button>
@@ -162,11 +179,9 @@ export const WorkspaceView: React.FC = () => {
             onClick={() => setMobileMenuOpen(false)}
             title="Open Platform Sandbox design demonstration"
           >
-            <span aria-hidden="true">🧪</span>
+            <FlaskConical size={16} strokeWidth={2} className="nav-item-icon" aria-hidden="true" />
             <span>Platform Sandbox</span>
-            <span className="coming-soon-badge" style={{ color: '#a7f3d0' }}>
-              Preview
-            </span>
+            <span className="preview-badge preview-badge-platform">Preview</span>
           </Link>
 
           <Link
@@ -175,11 +190,9 @@ export const WorkspaceView: React.FC = () => {
             onClick={() => setMobileMenuOpen(false)}
             title="Open Mission Control design demonstration"
           >
-            <span aria-hidden="true">◈</span>
+            <Radio size={16} strokeWidth={2} className="nav-item-icon" aria-hidden="true" />
             <span>Mission Control</span>
-            <span className="coming-soon-badge" style={{ color: '#fed7aa' }}>
-              Preview
-            </span>
+            <span className="preview-badge preview-badge-admin">Preview</span>
           </Link>
         </nav>
 
@@ -187,7 +200,7 @@ export const WorkspaceView: React.FC = () => {
         <div className="workspace-user-section">
           {signOutError && (
             <div className="workspace-signout-error" role="alert" aria-live="assertive">
-              <span aria-hidden="true">⚠</span>
+              <AlertCircle size={14} strokeWidth={2} aria-hidden="true" />
               <span>Sign-out failed: {signOutError}</span>
             </div>
           )}
@@ -211,7 +224,8 @@ export const WorkspaceView: React.FC = () => {
               aria-disabled={signingOut}
               aria-label={signingOut ? 'Signing out of Orbit...' : 'Sign out of Orbit'}
             >
-              {signingOut ? 'Signing out...' : 'Sign out'}
+              <LogOut size={13} strokeWidth={2} aria-hidden="true" />
+              <span>{signingOut ? 'Signing out...' : 'Sign out'}</span>
             </button>
           </div>
         </div>
@@ -222,7 +236,7 @@ export const WorkspaceView: React.FC = () => {
         {signOutError && (
           <div className="workspace-alert-banner error" role="alert" aria-live="assertive">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span aria-hidden="true">⚠</span>
+              <AlertCircle size={18} strokeWidth={2} aria-hidden="true" />
               <span>
                 <strong>Sign-out failed:</strong> {signOutError}
               </span>
@@ -233,41 +247,74 @@ export const WorkspaceView: React.FC = () => {
               onClick={() => setSignOutError(null)}
               aria-label="Dismiss error notification"
             >
-              ✕
+              <X size={16} aria-hidden="true" />
             </button>
           </div>
         )}
 
         {/* Topbar */}
         <header className="workspace-topbar">
-          <div>
+          <div className="workspace-topbar-title-group">
+            <div className="workspace-breadcrumb">
+              <span className="breadcrumb-root">ORBIT</span>
+              <span className="breadcrumb-separator">/</span>
+              <span className="breadcrumb-section">DEVELOPER WORKSPACE</span>
+              <span className="breadcrumb-separator">/</span>
+              <span className="breadcrumb-current">OVERVIEW</span>
+            </div>
             <h1>Workspace Overview</h1>
-            <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>
+            <p className="workspace-topbar-subtitle">
               Authenticated developer workspace shell • Orbit V2
             </p>
           </div>
           <div className="workspace-topbar-actions">
+            <div className="workspace-session-pill">
+              <span className="session-dot" aria-hidden="true" />
+              <span>Active Session</span>
+            </div>
             <Link to="/" className="workspace-external-link" title="View public Orbit website">
-              Marketing Site ↗
+              <span>Marketing Site</span>
+              <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
             </Link>
           </div>
         </header>
 
         {/* Welcome Dashboard Banner */}
         <section className="workspace-welcome-banner" aria-labelledby="welcome-heading">
-          <div className="workspace-status-chip">
-            <span className="status-dot" aria-hidden="true" />
-            <span>Authenticated via Supabase Auth</span>
+          <div className="welcome-banner-content">
+            <div className="workspace-status-chip">
+              <span className="status-dot" aria-hidden="true" />
+              <span>Authenticated via Supabase Auth</span>
+            </div>
+            <h2 id="welcome-heading">Welcome back, {userDisplayName}</h2>
+            <p>
+              Your Orbit developer workspace shell is ready. Connected to account identity{' '}
+              <strong>{user?.email}</strong>. This is your personal workspace where upcoming repository
+              connections, branch workflows, and human-in-the-loop AI orchestration will run.
+            </p>
           </div>
-          <h2 id="welcome-heading">Welcome back, {userDisplayName}</h2>
-          <p>
-            Your Orbit developer workspace shell is ready. Connected to account identity{' '}
-            <strong style={{ color: '#f1f5f9' }}>{user?.email}</strong>. This is your personal workspace
-            where upcoming repository connections, branch workflows, and human-in-the-loop AI orchestration will run.
-          </p>
+          <div className="welcome-banner-visual" aria-hidden="true">
+            <svg viewBox="0 0 240 160" fill="none" className="welcome-orbital-svg">
+              {/* Concentric precision orbital paths */}
+              <circle cx="120" cy="80" r="68" stroke="var(--orbit-border, #E1E6E8)" strokeWidth="1" strokeDasharray="3 3" />
+              <ellipse cx="120" cy="80" rx="98" ry="46" transform="rotate(-22 120 80)" stroke="var(--orbit-surface-soft-blue, #DFE6F2)" strokeWidth="1.5" />
+              <ellipse cx="120" cy="80" rx="104" ry="48" transform="rotate(26 120 80)" stroke="var(--orbit-brand-primary, #315CE8)" strokeWidth="1.75" />
+              {/* Precision coordinate ticks */}
+              <line x1="120" y1="20" x2="120" y2="28" stroke="var(--orbit-border, #E1E6E8)" strokeWidth="1.5" />
+              <line x1="120" y1="132" x2="120" y2="140" stroke="var(--orbit-border, #E1E6E8)" strokeWidth="1.5" />
+              <line x1="28" y1="80" x2="36" y2="80" stroke="var(--orbit-border, #E1E6E8)" strokeWidth="1.5" />
+              <line x1="204" y1="80" x2="212" y2="80" stroke="var(--orbit-border, #E1E6E8)" strokeWidth="1.5" />
+              {/* Center core */}
+              <circle cx="120" cy="80" r="14" fill="var(--orbit-surface-dark, #172536)" stroke="var(--orbit-border, #E1E6E8)" strokeWidth="2" />
+              <circle cx="120" cy="80" r="5" fill="var(--orbit-brand-highlight, #D6ED83)" />
+              {/* Orbital nodes & momentum tangent */}
+              <circle cx="198" cy="54" r="7" fill="var(--orbit-brand-primary, #315CE8)" stroke="#FFFFFF" strokeWidth="2" />
+              <circle cx="48" cy="102" r="5" fill="var(--orbit-brand-highlight, #D6ED83)" stroke="var(--orbit-surface-dark, #172536)" strokeWidth="1.5" />
+            </svg>
+          </div>
         </section>
 
-        {/* Projects Section with Truthful Empty State */}
+        {/* Projects Section with Intentional First-Run Empty State */}
         <section className="workspace-section" aria-labelledby="projects-heading">
           <div className="workspace-section-header">
             <div>
@@ -277,9 +324,19 @@ export const WorkspaceView: React.FC = () => {
           </div>
 
           <div className="workspace-empty-card" role="region" aria-label="Projects empty state">
-            <div className="workspace-empty-icon" aria-hidden="true">
-              📁
+            <div className="workspace-empty-illustration" aria-hidden="true">
+              <svg viewBox="0 0 140 100" fill="none" className="empty-schematic-svg">
+                <circle cx="70" cy="50" r="42" stroke="var(--orbit-border, #E1E6E8)" strokeWidth="1" strokeDasharray="3 3" />
+                <rect x="42" y="26" width="56" height="48" rx="8" fill="var(--orbit-surface-soft-blue, #DFE6F2)" stroke="var(--orbit-border, #E1E6E8)" strokeWidth="1" />
+                {/* Schematic Git branch inside card */}
+                <line x1="56" y1="60" x2="56" y2="40" stroke="var(--orbit-brand-primary, #315CE8)" strokeWidth="2" strokeLinecap="round" />
+                <path d="M56 50 C62 50, 68 46, 76 42" stroke="var(--orbit-brand-primary, #315CE8)" strokeWidth="2" strokeLinecap="round" />
+                <circle cx="56" cy="60" r="3.5" fill="var(--orbit-surface-dark, #172536)" />
+                <circle cx="56" cy="38" r="3.5" fill="var(--orbit-brand-primary, #315CE8)" />
+                <circle cx="76" cy="42" r="3.5" fill="var(--orbit-brand-highlight, #D6ED83)" stroke="var(--orbit-surface-dark, #172536)" strokeWidth="1" />
+              </svg>
             </div>
+
             <h4>No repositories or projects have been connected yet</h4>
             <p>
               Your Orbit workspace does not currently have any active repository connections. Project creation,
@@ -323,7 +380,12 @@ export const WorkspaceView: React.FC = () => {
 
           <div className="workspace-guide-grid">
             <div className="workspace-guide-card">
-              <span className="guide-step-tag">Step 1 • Live</span>
+              <div className="guide-card-top">
+                <span className="guide-step-tag guide-tag-live">Step 1 • Live</span>
+                <div className="guide-icon-wrapper guide-icon-live" aria-hidden="true">
+                  <ShieldCheck size={18} strokeWidth={2} />
+                </div>
+              </div>
               <h4>Authentication Active</h4>
               <p>
                 Your account is verified and securely authenticated with Supabase Auth. Session state and password
@@ -332,16 +394,37 @@ export const WorkspaceView: React.FC = () => {
             </div>
 
             <div className="workspace-guide-card">
-              <span className="guide-step-tag">Step 2 • Preview</span>
+              <div className="guide-card-top">
+                <span className="guide-step-tag guide-tag-preview">Step 2 • Preview</span>
+                <div className="guide-icon-wrapper guide-icon-preview" aria-hidden="true">
+                  <FlaskConical size={18} strokeWidth={2} />
+                </div>
+              </div>
               <h4>Explore Design Demonstrations</h4>
               <p>
                 Preview the upcoming developer workflow in the interactive Platform Sandbox and Mission Control
                 demonstrations before live repository linking opens.
               </p>
+              <div className="guide-card-links">
+                <Link to="/platform" className="guide-link">
+                  <span>Platform Sandbox</span>
+                  <ArrowUpRight size={12} strokeWidth={2} aria-hidden="true" />
+                </Link>
+                <span className="guide-link-dot">•</span>
+                <Link to="/admin" className="guide-link">
+                  <span>Mission Control</span>
+                  <ArrowUpRight size={12} strokeWidth={2} aria-hidden="true" />
+                </Link>
+              </div>
             </div>
 
             <div className="workspace-guide-card">
-              <span className="guide-step-tag">Step 3 • In Development</span>
+              <div className="guide-card-top">
+                <span className="guide-step-tag guide-tag-upcoming">Step 3 • In Development</span>
+                <div className="guide-icon-wrapper guide-icon-upcoming" aria-hidden="true">
+                  <GitBranch size={18} strokeWidth={2} />
+                </div>
+              </div>
               <h4>Phase 4.2: Git Connections</h4>
               <p>
                 The upcoming release will introduce verified GitHub repository connections, branch-level isolation,
@@ -353,12 +436,12 @@ export const WorkspaceView: React.FC = () => {
 
         {/* Truthful Architecture Note */}
         <aside className="workspace-notice-box" role="note">
-          <span style={{ fontSize: '18px' }} aria-hidden="true">
-            🛡
-          </span>
+          <div className="notice-icon-wrapper" aria-hidden="true">
+            <Shield size={18} strokeWidth={2} />
+          </div>
           <div>
             <strong>Approval-First Architecture:</strong>
-            <p style={{ margin: '4px 0 0' }}>
+            <p>
               Orbit never applies autonomous code modifications or executes repository changes without explicit
               developer review. Interactive sandbox features currently displayed in the marketing demos are design
               demonstrations and will arrive in this workspace in upcoming verified phases.
