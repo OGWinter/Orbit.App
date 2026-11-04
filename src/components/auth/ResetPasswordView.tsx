@@ -4,9 +4,8 @@ import AuthLayout from './AuthLayout';
 
 export const ResetPasswordView: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const initialExpired = searchParams.get('expired') === 'true' || searchParams.get('token') === 'invalid';
+  const isLinkExpired = searchParams.get('expired') === 'true' || searchParams.get('token') === 'invalid';
 
-  const [isLinkExpired, setIsLinkExpired] = useState(initialExpired);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -68,24 +67,26 @@ export const ResetPasswordView: React.FC = () => {
       }
     >
       <div className="auth-card-dark">
-        {/* State Toggle Bar for Design Demonstration */}
-        <div className="auth-state-toggle-banner">
-          <span>Design State Preview:</span>
-          <button
-            type="button"
-            className="auth-toggle-btn"
-            onClick={() => {
-              setIsLinkExpired(!isLinkExpired);
-              setIsSuccess(false);
-            }}
-          >
-            {isLinkExpired ? 'Switch to Active Token State' : 'Switch to Expired Link State'}
-          </button>
-        </div>
-
         {isLinkExpired ? (
           <div>
             <div className="auth-card-header">
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.28)',
+                  padding: '3px 9px',
+                  borderRadius: '999px',
+                  color: '#fca5a5',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  marginBottom: '10px',
+                }}
+              >
+                <span>⚠</span> EXPIRED LINK PREVIEW
+              </div>
               <h1 style={{ color: '#f87171' }}>Reset link expired</h1>
               <p>
                 This password recovery link is invalid or has expired. For your security, reset links are only active for 60 minutes.
@@ -95,9 +96,9 @@ export const ResetPasswordView: React.FC = () => {
             <div className="auth-notice-box error" role="alert">
               <span>⚠</span>
               <div>
-                <strong>Invalid Link Demonstration</strong>
+                <strong>Invalid Link Demonstration:</strong>
                 <p style={{ margin: '4px 0 0', fontSize: '12px' }}>
-                  Please request a new reset token to choose a new password.
+                  This screen is rendered because the link parameter was flagged as expired (<code style={{ color: '#fca5a5', background: 'rgba(0,0,0,0.2)', padding: '1px 4px', borderRadius: '4px' }}>?expired=true</code> or <code style={{ color: '#fca5a5', background: 'rgba(0,0,0,0.2)', padding: '1px 4px', borderRadius: '4px' }}>?token=invalid</code>).
                 </p>
               </div>
             </div>
@@ -115,16 +116,33 @@ export const ResetPasswordView: React.FC = () => {
         ) : isSuccess ? (
           <div>
             <div className="auth-card-header">
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.28)',
+                  padding: '3px 9px',
+                  borderRadius: '999px',
+                  color: '#6ee7b7',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  marginBottom: '10px',
+                }}
+              >
+                <span>✓</span> DESIGN PREVIEW
+              </div>
               <h1>Password updated</h1>
-              <p>Your password reset preview has been completed successfully.</p>
+              <p>Your password reset form validation has succeeded in preview mode.</p>
             </div>
 
             <div className="auth-notice-box success" role="status">
               <span style={{ fontSize: '18px' }}>✓</span>
               <div>
                 <strong>Design Preview Notice:</strong>
-                <p style={{ margin: '4px 0 0', fontSize: '12px' }}>
-                  Form submission validated locally with 0 errors. Real token verification and credential hashing will be wired in the backend phase.
+                <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
+                  Form submission validated locally with 0 errors. Notice: This is a design preview — no real account or database credentials were changed. Real token verification and credential hashing will be wired in the backend phase.
                 </p>
               </div>
             </div>
@@ -138,8 +156,25 @@ export const ResetPasswordView: React.FC = () => {
         ) : (
           <div>
             <div className="auth-card-header">
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(117, 100, 245, 0.12)',
+                  border: '1px solid rgba(117, 100, 245, 0.28)',
+                  padding: '3px 9px',
+                  borderRadius: '999px',
+                  color: '#c4b5fd',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  marginBottom: '10px',
+                }}
+              >
+                <span className="live-dot" /> DESIGN PREVIEW
+              </div>
               <h1>Choose a new password</h1>
-              <p>Set a strong password to safeguard your repositories and workspace.</p>
+              <p>Set a strong password to safeguard your repositories and workspace. (UI Preview — No live account modified)</p>
             </div>
 
             <form className="auth-form" onSubmit={handleSubmit} noValidate>

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import SignInView from '../components/auth/SignInView';
 import RegisterView from '../components/auth/RegisterView';
@@ -169,64 +169,125 @@ describe('Phase 2 — Authentication UI Test Suite', () => {
   });
 
   describe('ResetPasswordView (/reset-password)', () => {
-    it('validates new password confirmation and supports expired link state preview', () => {
+    it('renders active reset preview and confirms no real account is modified', () => {
       render(
-        <MemoryRouter>
+        <MemoryRouter initialEntries={['/reset-password']}>
           <ResetPasswordView />
         </MemoryRouter>
       );
 
       expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
+      expect(screen.getByText(/UI Preview — No live account modified/i)).toBeInTheDocument();
 
-      // Test toggle to expired state
-      const toggleBtn = screen.getByRole('button', { name: /Switch to Expired Link State/i });
-      fireEvent.click(toggleBtn);
-
-      expect(screen.getByRole('heading', { name: /Reset link expired/i })).toBeInTheDocument();
-      expect(screen.getByText(/This password recovery link is invalid or has expired/i)).toBeInTheDocument();
-
-      // Switch back to active token state
-      const switchBackBtn = screen.getByRole('button', { name: /Switch to Active Token State/i });
-      fireEvent.click(switchBackBtn);
-      expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
-
-      // Fill valid passwords
+      // Submit matching password
       fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'NewSuperPass2026!' } });
       fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'NewSuperPass2026!' } });
       fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
 
       expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
+      expect(screen.getByText(/no real account or database credentials were changed/i)).toBeInTheDocument();
+    });
+
+    it('renders expired reset preview when ?expired=true or ?token=invalid is provided', () => {
+      render(
+        <MemoryRouter initialEntries={['/reset-password?expired=true']}>
+          <ResetPasswordView />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByRole('heading', { name: /Reset link expired/i })).toBeInTheDocument();
+      expect(screen.getByText(/This password recovery link is invalid or has expired/i)).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /Request New Reset Link/i })).toBeInTheDocument();
+    });
+
+    it('renders invalid link preview when ?token=invalid is provided', () => {
+      render(
+        <MemoryRouter initialEntries={['/reset-password?token=invalid']}>
+          <ResetPasswordView />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByRole('heading', { name: /Reset link expired/i })).toBeInTheDocument();
     });
   });
 
   describe('InviteAcceptanceView (/invite)', () => {
-    it('renders prefilled invited email and supports expired state toggle', () => {
+    it('renders valid invitation preview with sample data clearly identified as demo', () => {
       render(
         <MemoryRouter initialEntries={['/invite?email=alex@orbit.app&team=Atlas+Core']}>
           <InviteAcceptanceView />
         </MemoryRouter>
       );
 
-      expect(screen.getByText(/Join Atlas Core/i)).toBeInTheDocument();
+      expect(screen.getByText(/SAMPLE INVITATION \(DEMO DATA\)/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /Join Atlas Core/i })).toBeInTheDocument();
       const emailInput = screen.getByLabelText(/Invited Work Email/i) as HTMLInputElement;
       expect(emailInput.value).toBe('alex@orbit.app');
       expect(emailInput.readOnly).toBe(true);
 
-      // Toggle expired state
-      const toggleBtn = screen.getByRole('button', { name: /Switch to Expired Invite State/i });
-      fireEvent.click(toggleBtn);
+      // Fill form and submit
+      fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Alex Developer' } });
+      fireEvent.change(screen.getByLabelText(/^Create Password$/i), { target: { value: 'SecurePass2026!' } });
+      fireEvent.change(screen.getByLabelText(/^Confirm Password$/i), { target: { value: 'SecurePass2026!' } });
+      fireEvent.click(screen.getByRole('button', { name: /Accept Invitation & Join Team/i }));
+
+      expect(screen.getByRole('heading', { name: /Invitation preview completed/i })).toBeInTheDocument();
+      expect(screen.getByText(/no live invitation was redeemed and no database account was created/i)).toBeInTheDocument();
+    });
+
+    it('renders expired invitation preview when ?expired=true is provided', () => {
+      render(
+        <MemoryRouter initialEntries={['/invite?expired=true&team=Atlas+Core']}>
+          <InviteAcceptanceView />
+        </MemoryRouter>
+      );
+
       expect(screen.getByRole('heading', { name: /Invitation expired/i })).toBeInTheDocument();
+      expect(screen.getByText(/This workspace invitation link is invalid or has already been redeemed/i)).toBeInTheDocument();
+    });
+
+    it('gracefully handles missing URL parameters without crashing', () => {
+      render(
+        <MemoryRouter initialEntries={['/invite']}>
+          <InviteAcceptanceView />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByRole('heading', { name: /Join Skyline Engineering/i })).toBeInTheDocument();
+      const emailInput = screen.getByLabelText(/Invited Work Email/i) as HTMLInputElement;
+      expect(emailInput.value).toBe('developer@skyline.tech');
     });
   });
 
   describe('Direct Route Navigation in App Root', () => {
-    beforeEach(() => {
-      window.history.pushState(null, '', '/login');
-    });
-
     it('renders SignInView when directly loading /login', () => {
+      window.history.pushState(null, '', '/login');
       render(<App />);
       expect(screen.getByRole('heading', { name: /Welcome back/i })).toBeInTheDocument();
+    });
+
+    it('renders RegisterView when directly loading /register', () => {
+      window.history.pushState(null, '', '/register');
+      render(<App />);
+      expect(screen.getByRole('heading', { name: /Create your account/i })).toBeInTheDocument();
+    });
+
+    it('renders ForgotPasswordView when directly loading /forgot-password', () => {
+      window.history.pushState(null, '', '/forgot-password');
+      render(<App />);
+      expect(screen.getByRole('heading', { name: /Reset password/i })).toBeInTheDocument();
+    });
+
+    it('renders ResetPasswordView when directly loading /reset-password', () => {
+      window.history.pushState(null, '', '/reset-password');
+      render(<App />);
+      expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
+    });
+
+    it('renders InviteAcceptanceView when directly loading /invite', () => {
+      window.history.pushState(null, '', '/invite');
+      render(<App />);
+      expect(screen.getByText(/SAMPLE INVITATION \(DEMO DATA\)/i)).toBeInTheDocument();
     });
   });
 });

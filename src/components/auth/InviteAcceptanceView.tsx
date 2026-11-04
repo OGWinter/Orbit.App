@@ -4,11 +4,12 @@ import AuthLayout from './AuthLayout';
 
 export const InviteAcceptanceView: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const invitedEmail = searchParams.get('email') || 'developer@skyline.tech';
-  const teamName = searchParams.get('team') || 'Skyline Engineering';
-  const initialExpired = searchParams.get('expired') === 'true' || searchParams.get('status') === 'invalid';
+  const rawEmail = searchParams.get('email');
+  const rawTeam = searchParams.get('team');
+  const invitedEmail = rawEmail && rawEmail.trim() ? rawEmail.trim() : 'developer@skyline.tech';
+  const teamName = rawTeam && rawTeam.trim() ? rawTeam.trim() : 'Skyline Engineering';
+  const isInviteExpired = searchParams.get('expired') === 'true' || searchParams.get('status') === 'invalid' || searchParams.get('status') === 'expired';
 
-  const [isInviteExpired, setIsInviteExpired] = useState(initialExpired);
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -79,24 +80,26 @@ export const InviteAcceptanceView: React.FC = () => {
       }
     >
       <div className="auth-card-dark" style={{ maxWidth: '480px' }}>
-        {/* Toggle between Active and Expired Invite States */}
-        <div className="auth-state-toggle-banner">
-          <span>Design State Preview:</span>
-          <button
-            type="button"
-            className="auth-toggle-btn"
-            onClick={() => {
-              setIsInviteExpired(!isInviteExpired);
-              setIsAccepted(false);
-            }}
-          >
-            {isInviteExpired ? 'Switch to Valid Invite State' : 'Switch to Expired Invite State'}
-          </button>
-        </div>
-
         {isInviteExpired ? (
           <div>
             <div className="auth-card-header">
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.28)',
+                  padding: '3px 9px',
+                  borderRadius: '999px',
+                  color: '#fca5a5',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  marginBottom: '10px',
+                }}
+              >
+                <span>⚠</span> EXPIRED INVITATION PREVIEW
+              </div>
               <h1 style={{ color: '#f87171' }}>Invitation expired</h1>
               <p>
                 This workspace invitation link is invalid or has already been redeemed.
@@ -107,8 +110,8 @@ export const InviteAcceptanceView: React.FC = () => {
               <span>⚠</span>
               <div>
                 <strong>Expired Link Demonstration:</strong>
-                <p style={{ margin: '4px 0 0', fontSize: '12px' }}>
-                  Please contact your workspace administrator at <strong>{teamName}</strong> to issue a fresh invitation.
+                <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
+                  This screen is rendered because the link was flagged as expired (<code style={{ color: '#fca5a5', background: 'rgba(0,0,0,0.2)', padding: '1px 4px', borderRadius: '4px' }}>?expired=true</code>). In production, contact your workspace administrator at <strong>{teamName}</strong> to issue a fresh invitation.
                 </p>
               </div>
             </div>
@@ -121,22 +124,39 @@ export const InviteAcceptanceView: React.FC = () => {
 
             <div className="auth-footer-prompt">
               Need assistance?
-              <Link to="/">Contact Orbit Support</Link>
+              <Link to="/">Back to Home</Link>
             </div>
           </div>
         ) : isAccepted ? (
           <div>
             <div className="auth-card-header">
-              <h1>Invitation accepted!</h1>
-              <p>You have joined the <strong>{teamName}</strong> workspace.</p>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.28)',
+                  padding: '3px 9px',
+                  borderRadius: '999px',
+                  color: '#6ee7b7',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  marginBottom: '10px',
+                }}
+              >
+                <span>✓</span> INVITATION PREVIEW
+              </div>
+              <h1>Invitation preview completed</h1>
+              <p>Sample setup for <strong>{teamName}</strong> workspace.</p>
             </div>
 
             <div className="auth-notice-box success" role="status">
               <span style={{ fontSize: '18px' }}>✓</span>
               <div>
-                <strong>Design Preview Notice:</strong>
-                <p style={{ margin: '4px 0 0', fontSize: '12px' }}>
-                  Account details for <strong>{fullName}</strong> ({invitedEmail}) have been validated. Backend team provisioning will occur during the backend integration phase.
+                <strong>Design Preview Confirmation:</strong>
+                <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
+                  Account details for <strong>{fullName}</strong> ({invitedEmail}) have been validated locally. Notice: This is a design preview — no live invitation was redeemed and no database account was created. Real invitation redemption will be activated in the backend phase.
                 </p>
               </div>
             </div>
@@ -157,18 +177,18 @@ export const InviteAcceptanceView: React.FC = () => {
                   gap: '6px',
                   background: 'rgba(117,100,245,0.15)',
                   border: '1px solid rgba(117,100,245,0.3)',
-                  padding: '4px 10px',
+                  padding: '3px 9px',
                   borderRadius: '999px',
                   color: '#c4b5fd',
                   fontSize: '11px',
                   fontWeight: 600,
-                  marginBottom: '12px',
+                  marginBottom: '10px',
                 }}
               >
-                <span>◈</span> TEAM INVITATION
+                <span>◈</span> SAMPLE INVITATION (DEMO DATA)
               </div>
               <h1>Join {teamName}</h1>
-              <p>Set up your developer profile to collaborate with your team on Orbit.</p>
+              <p>Set up your developer profile to preview team collaboration on Orbit. (Sample Invitation Demonstration)</p>
             </div>
 
             <form className="auth-form" onSubmit={handleSubmit} noValidate>

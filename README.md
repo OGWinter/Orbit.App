@@ -81,10 +81,12 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
 
 ## Tech Stack & Tooling
 
-- **React 18**
-- **TypeScript**
-- **Vite 6**
-- **Custom Orbit CSS & Design System** (`src/styles/orbit.css`)
+- **Node.js Environment**: `>=18.0.0` (LTS recommended; tested across Node 18, 20, 22)
+- **React 18**: Core component hierarchy (`^18.3.1`)
+- **React Router 7**: Modern client-side routing & deep-link navigation (`^7.x`)
+- **TypeScript 5**: Strict type verification (`^5.6.3`)
+- **Vite 6**: Fast ESM bundler & dev server (`^6.0.7`)
+- **Custom Orbit CSS & Design System**: (`src/styles/orbit.css` & `src/styles/auth.css`)
 
 ---
 
