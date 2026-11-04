@@ -81,6 +81,6 @@ describe('HeroSection Component', () => {
     act(() => {
       vi.advanceTimersByTime(1600);
     });
-    expect(screen.getByText(/Design Demonstration: 3\/3 simulated verification checks completed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Design Demonstration: Proposed plan & staged diffs ready for developer approval/i)).toBeInTheDocument();
   });
 });

@@ -7,45 +7,41 @@ export const WorkflowSection: React.FC = () => {
   const steps = [
     {
       num: '01',
-      title: 'Describe the destination',
-      desc: 'Set the goal in natural language. Add constraints, mockups, or database requirements where it helps.',
-      statusActive: 'INTENT PARSED',
+      title: 'Describe what you want to build',
+      desc: 'Set the goal in natural language. Add constraints, mockups, or stack preferences where it helps.',
+      statusActive: 'PLAN PROPOSED',
       statusInactive: 'PHASE 1',
-      detailBadge: 'Requirements Synthesis',
+      detailBadge: 'Requirements Mapping',
       simulationCode: `// Phase 1: Synthesizing destination (Design Demo)
 const brief = "Create an immersive product gallery with smooth transitions";
 
-const intent = AgentEngine.parseIntent(brief);
-
-// Generated 3 sub-tasks with bounded module scopes`,
+// AI analyzes codebase and maps component boundaries for your review
+// Generated 3 proposed changes awaiting your approval`,
     },
     {
       num: '02',
       title: 'Review the plan & diffs',
-      desc: 'See the architectural approach before work begins. Steer dependencies, database tables, and component APIs.',
-      statusActive: 'DIFFS APPLIED',
+      desc: 'Inspect proposed architectural steps and file edits. You remain in control: modify constraints or approve before any code is written.',
+      statusActive: 'AWAITING APPROVAL',
       statusInactive: 'PHASE 2',
-      detailBadge: 'Branch & File Edits',
-      simulationCode: `// Phase 2: Isolated Branch Generation (Design Demo)
+      detailBadge: 'Approval Gate',
+      simulationCode: `// Phase 2: Isolated Branch Staging (Design Demo)
 git checkout -b orbit/storefront-refresh
-// Modifying ProductGallery.tsx (+84, -20 lines)
-// Modifying theme.css (+20 lines)
-// Transformed AST with 0 TypeScript errors`,
+// Proposed diffs for ProductGallery.tsx (+84, -20 lines)
+// Proposed diffs for theme.css (+20 lines)
+// Gated on explicit developer sign-off`,
     },
     {
       num: '03',
-      title: 'Follow work through live verification',
-      desc: 'Track edits, automated headless browser tests, and responsive reviews as your project comes together.',
-      statusActive: 'VERIFIED (12/12)',
+      title: 'Approve before merging',
+      desc: 'Inspect isolated branch diffs, simulated checks, and responsive layouts. Nothing merges without your sign-off.',
+      statusActive: 'DEVELOPER SIGN-OFF',
       statusInactive: 'PHASE 3',
-      detailBadge: 'Automated Headless Test',
-      simulationCode: `// Phase 3: Headless Playwright Review (Design Demo)
-await page.goto('http://localhost:3000');
-
-await expect(page.locator('.mock-product-grid')).toBeVisible();
-
-// ✓ Viewport Responsive (390px, 768px, 1200px)
-// ✓ 0 Console Errors | Ready for Release`,
+      detailBadge: 'Final Approval',
+      simulationCode: `// Phase 3: Developer Review & Sign-Off (Design Demo)
+// Proposed visual checks ready for inspection
+// Viewport Responsive (390px, 768px, 1200px)
+// Requires developer approval to merge`,
     },
   ];
 
@@ -60,10 +56,10 @@ await expect(page.locator('.mock-product-grid')).toBeVisible();
           <h2 id="workflow-title">
             Think in outcomes.
             <br />
-            <span>Build with clarity.</span>
+            <span>Stay in control.</span>
           </h2>
           <p>
-            Describe what you want to achieve. Orbit turns the goal into a visible plan, generates isolated branch diffs, and verifies running code in headless browsers before you merge.
+            Describe what you want to achieve. Orbit analyzes your repository, prepares a transparent execution plan with isolated diffs, and waits for your approval before modifying code.
           </p>
           <button
             type="button"

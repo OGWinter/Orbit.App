@@ -19,50 +19,50 @@ export const BuilderRolesSection: React.FC<BuilderRolesSectionProps> = ({ onRole
   > = {
     frontend: {
       kicker: 'FOR FRONTEND DEVELOPERS',
-      title: 'Shape the user experience while agents handle repetitive markup.',
+      title: 'Shape the user experience with reviewable component proposals.',
       description:
-        'Explore visual directions, refine design tokens, and review responsive components right beside your code with real-time browser preview synchronization.',
+        'Explore visual directions, refine design tokens, and review proposed responsive component diffs before approving.',
       points: [
-        'Iterate on real browser previews with live HMR',
-        'Keep design intent synchronized with CSS variables',
-        'Review responsive viewports (Mobile, Tablet, Desktop) as changes land',
-        'Atomic component scaffolding for React, Vue, and Tailwind',
+        'Review proposed UI diffs before applying to components',
+        'Keep design tokens synchronized with CSS variables',
+        'Inspect proposed layouts across mobile, tablet, and desktop',
+        'Scaffold atomic components with developer oversight',
       ],
     },
     backend: {
       kicker: 'FOR BACKEND ARCHITECTS & ENGINEERS',
-      title: 'Orchestrate robust APIs, database migrations, and microservice contracts.',
+      title: 'Review API designs, schema migrations, and contracts before commit.',
       description:
-        'Let agents generate typed OpenAPI specs, optimize SQL queries, and implement authentication while you supervise system performance, database integrity, and data safety.',
+        'Let AI draft typed OpenAPI specs, SQL migrations, and endpoints while you maintain complete authority over system architecture and database safety.',
       points: [
-        'Auto-generate REST & GraphQL endpoints with type-safe schema contracts',
-        'Manage SQLite (orbit.db), Postgres, and Cloud SQL with rollbacks',
-        'Enforce RBAC security, JWT claims, and rate-limiting middleware',
-        'Automated database audit logs and schema health checks',
+        'Inspect drafted REST & GraphQL endpoints before committing',
+        'Review database migrations with safe rollback plans',
+        'Audit security rules, JWT claims, and permission boundaries',
+        'Maintain complete developer control over database schemas',
       ],
     },
     fullstack: {
       kicker: 'FOR FULL STACK BUILDERS',
-      title: 'Keep the whole system in view from interface to database.',
+      title: 'Keep the whole system in view with approval at every boundary.',
       description:
-        'Give agents context across your entire project so they can trace a feature change seamlessly from the frontend UI through to the Express API and SQLite data layer.',
+        'Give AI full repository context to propose end-to-end changes while you review how frontend components connect with backend endpoints before applying edits.',
       points: [
-        'Trace edits across connected frontend and backend files',
-        'Keep API contracts and React client hooks synchronized',
-        'Inspect SQLite queries and real-time network payloads in one window',
-        'Export unified Docker containers and production cloud artifacts',
+        'Trace proposed edits across connected frontend and backend files',
+        'Ensure API contracts and client hooks stay aligned',
+        'Review multi-file diffs in a unified preview',
+        'Developer sign-off required for all cross-stack updates',
       ],
     },
     teams: {
       kicker: 'FOR ENGINEERING & PRODUCT TEAMS',
-      title: 'Move together from product brief to verified release.',
+      title: 'Move together with transparent plans and human sign-offs.',
       description:
-        'Make execution plans, branch diffs, and visual reviews transparent so engineers, designers, and managers collaborate with a shared mental model.',
+        'Make execution plans, branch diffs, and reviews visible so engineers and leads can review, comment, and approve changes before anything touches production.',
       points: [
-        'Centralize project briefs and PR acceptance criteria',
-        'Isolate agent work to dedicated Git branches before merging',
-        'Automated visual regression tests and reviewer sign-offs',
-        'Live multi-role activity feeds and collaborative task queues',
+        'Review agent proposals collaboratively with your team',
+        'Isolate proposed changes to dedicated Git branches',
+        'Enforce human-in-the-loop approvals before merging',
+        'Shared mental model from feature brief to approved code',
       ],
     },
   };

@@ -102,7 +102,7 @@ export const Footer: React.FC<FooterProps> = ({
             <span>orbit</span>
           </a>
           <p style={{ marginTop: '12px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
-            The agent-first development workspace. Plan, execute, and verify software systems with autonomous AI orchestrations.
+            The approval-first developer workspace. Understand your codebase, plan changes with AI, and review every diff before it touches your code.
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export const Footer: React.FC<FooterProps> = ({
           <nav aria-label="Architecture links">
             <a href="#workflow">Outcome Synthesis</a>
             <a href="#workflow">Branch Isolation</a>
-            <a href="#workflow">Headless Verification</a>
+            <a href="#workflow">Review & Approval</a>
             <a href="#for-builders">Full-Stack Sync</a>
           </nav>
         </div>

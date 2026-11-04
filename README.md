@@ -1,8 +1,8 @@
-# Orbit.App — The Agent-First Workspace
+# Orbit.App — The Approval-First Workspace
 
-> **An agent-first development workspace that helps you turn ambitious ideas into working software, with interactive AI agent orchestration, waitlist queues, and Mission Control admin dashboard.**
+> **An approval-first developer workspace where AI understands your codebase, proposes architectural plans, and waits for your review and approval before modifying code.**
 
-Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) including all interactive UI components, animations, styles, and views.
+Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual identity while enforcing approval-first product messaging and explicit demonstration labeling across all views.
 
 ---
 
@@ -23,36 +23,36 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) includi
    - Responsive mobile navigation drawer with hamburger toggle.
 
 2. **Hero Section**:
-   - Eyebrow: `● THE AGENT-FIRST WORKSPACE`
+   - Eyebrow: `● THE APPROVAL-FIRST WORKSPACE`
    - Headline: *"Make room for what’s next."*
-   - Description and action buttons (`Explore the platform ↗`, `Start on Win / Mac ⚡`, `See how it works ↓`).
-   - Verified platform capability proof list.
+   - Description emphasizing AI proposals and human-in-the-loop review.
+   - Approval-first core principles list.
    - Interactive hero window mockup:
      - Branch switcher (`main`, `staging`, `feat/storefront-refresh`).
-     - Task prompt input (`Run ✳`) with live 3-stage agent simulation (`Synthesizing requirements` → `Writing component diffs` → `Headless browser validation`).
+     - Task prompt input (`Run ✳`) with staged simulation demonstrating proposed changes and developer approval gates.
      - Interactive rail icons (`⌘` Editor, `▤` Plan, `⌕` Search, `⚙` Settings).
-     - Floating tags (`tag-plan`, `tag-verify`) triggering detailed architecture & verification popovers.
+     - Floating tags (`tag-plan`, `tag-verify`) triggering detailed architecture & inspection popovers.
      - Live preview floating card showing sunglasses store preview.
 
 3. **Capability Strip**:
    - Philosophy breakdown: *"One clear direction. More momentum at every step."*
-   - Interactive capability badges triggering the Orbit Philosophy modal.
+   - Interactive capability badges triggering the Orbit Philosophy modal with approval-first explanations.
 
 4. **Platform Section (01 / 02 / 03)**:
    - `01 / ORCHESTRATE`: Multi-agent constellation diagram with active nodes.
-   - `02 / CREATE`: Code editor preview with component diffs.
-   - `03 / VERIFY`: Headless browser visual checks preview.
+   - `02 / CREATE`: Code editor preview with proposed component diffs.
+   - `03 / APPROVE`: Staged preview and review checks before merge.
 
 5. **Workflow Section**:
    - 3-step vertical progress timeline:
-     - 01: Describe the destination
+     - 01: Describe what you want to build
      - 02: Review the plan & diffs
-     - 03: Follow work through live verification
+     - 03: Approve before merging
    - Interactive Workflow Simulator modal.
 
 6. **Made For How You Build**:
    - Role switcher tabs: `Frontend`, `Backend`, `Full stack`, `Teams`.
-   - Dynamic role-specific architecture cards and visual diagrams.
+   - Dynamic role-specific architecture cards emphasizing human oversight and approval at every layer.
 
 7. **Closing CTA**:
    - Animated orbital ring background with glowing node.
@@ -63,19 +63,19 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) includi
    - Links to Platform Sandbox, Mission Control, Documentation, and GitHub.
 
 9. **Modals & Overlays**:
-   - **Early Access Waitlist Modal**: Role selection, work email validation, and live queue position reservation.
+   - **Early Access Waitlist Modal**: Role selection, work email validation, and local preview queue position reservation.
    - **Team Demo Inquiry Modal**: Enterprise inquiry submission with local storage recording.
    - **Local Runtime Launcher Modal**: One-click startup for Windows & Mac with copyable commands (`npx orbit-workspace start`).
 
-10. **Platform Sandbox IDE (`/platform` or `#platform-sandbox`)**:
+10. **Platform Sandbox Prototype (`/platform` or `#platform-sandbox`)**:
     - Full-screen interactive IDE with project selector and branch dropdown.
     - Code editor with file tabs (`ProductGallery.tsx`, `tailwind.config.js`, `server.ts`).
-    - Real-time agent log stream.
+    - Staged agent audit log stream.
     - Responsive browser preview with Desktop, Tablet, and Mobile viewport switches.
-    - Interactive e-commerce preview of the Horizon Soundstage Speaker with live color swatches (`Warm Sand`, `Obsidian Night`, `Deep Sage`), angle thumbnails, and Add to Cart counter.
+    - Interactive e-commerce prototype of the Horizon Soundstage Speaker with live color swatches (`Warm Sand`, `Obsidian Night`, `Deep Sage`), angle thumbnails, and Add to Cart counter.
 
 11. **Mission Control Admin Dashboard (`/admin` or `#admin`)**:
-    - Complete administration portal: Overview metrics, Waitlist management table (status toggle, search, delete, CSV export), Inquiries review, Newsletter subscribers, and SMTP test email sender.
+    - Complete administration portal: Overview metrics, Waitlist management table (status toggle, search, delete, CSV export), Inquiries review, Newsletter subscribers, and preview database controls.
 
 ---
 

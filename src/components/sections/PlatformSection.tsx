@@ -15,7 +15,7 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
           the work ahead.
         </h2>
         <p className="section-intro">
-          Move from individual prompts to a whole project in motion. Orbit gives agents the context and tools to carry work across the finish line.
+          Move from uncontrolled prompts to an approval-first workspace. Orbit analyzes your codebase, plans atomic changes, and waits for your review and approval before touching code.
         </p>
       </div>
 
@@ -41,7 +41,7 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
             on the same page.
           </h3>
           <p>
-            Give a clear brief, then follow each agent’s plan and progress from one focused workspace.
+            Give a clear brief, then inspect and approve each proposed step from one focused workspace.
           </p>
           <button
             type="button"
@@ -80,12 +80,12 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
             <span className="code-cursor" />
           </div>
           <h3>
-            Write code across
+            Propose changes
             <br />
-            your stack with context.
+            with full stack context.
           </h3>
           <p>
-            Orbit sees how files connect, so multi-component changes and database updates happen in sync.
+            Orbit sees how files connect, drafting coordinated diffs and schema updates for your inspection and sign-off.
           </p>
           <button
             type="button"
@@ -93,7 +93,7 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
             onClick={onOpenPlatformDemo}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
-            See editing <span aria-hidden="true">↗</span>
+            See editing preview <span aria-hidden="true">↗</span>
           </button>
         </article>
 
@@ -101,7 +101,7 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
         <article className="feature-card feature-card-mint">
           <div className="feature-topline">
             <span className="feature-icon icon-browser">✓</span>
-            <span>03 / VERIFY</span>
+            <span>03 / APPROVE</span>
           </div>
           <div className="browser-art" aria-hidden="true">
             <div className="browser-bar">
@@ -126,12 +126,12 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
             </div>
           </div>
           <h3>
-            Check changes
+            Review changes
             <br />
             before they merge.
           </h3>
           <p>
-            Run tests, review visual outputs in real time, and confirm behavior before anything hits production.
+            Inspect proposed diffs and visual layouts side-by-side, giving you complete approval control before anything hits production.
           </p>
           <button
             type="button"
@@ -139,7 +139,7 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
             onClick={onOpenPlatformDemo}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
-            See verification <span aria-hidden="true">↗</span>
+            See approval flow <span aria-hidden="true">↗</span>
           </button>
         </article>
       </div>

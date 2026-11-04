@@ -37,17 +37,17 @@ export const CapabilityStrip: React.FC = () => {
               type="button"
               className="strip-item-btn"
               onClick={() => setPhilosophyOpen(true)}
-              title="Build across your code"
+              title="Propose across your code"
             >
-              <i className="strip-icon icon-build">⌘</i> Build across your code
+              <i className="strip-icon icon-build">⌘</i> Propose across your code
             </button>
             <button
               type="button"
               className="strip-item-btn"
               onClick={() => setPhilosophyOpen(true)}
-              title="Verify what ships"
+              title="Approve before shipping"
             >
-              <i className="strip-icon icon-check">✓</i> Verify what ships
+              <i className="strip-icon icon-check">✓</i> Approve before shipping
             </button>
           </div>
         </div>
@@ -82,7 +82,7 @@ export const CapabilityStrip: React.FC = () => {
               <span>More momentum at every step.</span>
             </h3>
             <p className="cute-card-desc">
-              Most AI dev tools trap you in conversational ping-pong. Orbit treats coding as an autonomous, verified pipeline that gives you complete certainty.
+              Most AI dev tools make unreviewed changes or trap you in chat. Orbit is built approval-first: the AI proposes architectural plans and isolated diffs, waiting for your explicit review and sign-off before modifying code.
             </p>
             <div className="cute-steps-grid">
               <div className="cute-step-pill step-plan">
@@ -95,15 +95,15 @@ export const CapabilityStrip: React.FC = () => {
               <div className="cute-step-pill step-build">
                 <div className="cute-step-icon">⌘</div>
                 <div className="cute-step-content">
-                  <strong>02 / Build Across Your Stack</strong>
-                  <p>Coordinates multi-file modifications in git-isolated staging trees without polluting your main branch.</p>
+                  <strong>02 / Propose Isolated Changes</strong>
+                  <p>Coordinates multi-file modifications in git-isolated branches without altering your main codebase until approved.</p>
                 </div>
               </div>
               <div className="cute-step-pill step-verify">
                 <div className="cute-step-icon">✓</div>
                 <div className="cute-step-content">
-                  <strong>03 / Verify Before You Ship</strong>
-                  <p>Headless browser runs, responsive layout checks, and unit test suites validate outcomes before release.</p>
+                  <strong>03 / Review & Approve Before Release</strong>
+                  <p>Inspect every proposed diff, simulated check, and layout update. You retain complete authority over every commit.</p>
                 </div>
               </div>
             </div>

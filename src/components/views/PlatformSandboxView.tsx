@@ -25,8 +25,8 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
     '09:42:10 [AST Analyzer] Parsed 3 modules: ProductGallery.tsx, Carousel.tsx, theme.css',
     '09:42:12 [Git Isolation] Created atomic branch checkout main -> staging',
     '09:42:14 [Vite HMR] Transformed 3 modules in 14ms (39.8kb gzip)',
-    '09:42:15 [Headless Playwright] Verified layout across desktop, tablet, and mobile viewports',
-    '09:42:16 [Orbit Engine] ✓ Ready for builder supervision (Design Demonstration)',
+    '09:42:15 [Approval Review] Staged proposed layout across desktop, tablet, and mobile viewports',
+    '09:42:16 [Orbit Demo] Staged for developer review & approval (Design Demonstration)',
   ]);
 
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -40,14 +40,14 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
     setExecutionState('planning');
     setLogLines((prev) => [
       `--:--:-- [Brief Received] "${promptText.slice(0, 48)}..."`,
-      '--:--:-- [Step 1/3] Synthesizing component hierarchy & token boundaries...',
+      '--:--:-- [Step 1/3] Synthesizing requirements into proposal (Approval required)...',
       ...prev.slice(0, 4),
     ]);
 
     const t1 = setTimeout(() => {
       setExecutionState('building');
       setLogLines((prev) => [
-        '--:--:-- [Step 2/3] Writing atomic diffs across ProductGallery.tsx (+142, -38)',
+        '--:--:-- [Step 2/3] Drafting proposed diffs for ProductGallery.tsx (Awaiting approval)...',
         ...prev.slice(0, 5),
       ]);
     }, 1800);
@@ -55,7 +55,7 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
     const t2 = setTimeout(() => {
       setExecutionState('verifying');
       setLogLines((prev) => [
-        '--:--:-- [Step 3/3] Running headless Playwright checks across 3 viewports...',
+        '--:--:-- [Step 3/3] Staging preview checks for developer inspection...',
         ...prev.slice(0, 5),
       ]);
     }, 3600);
@@ -64,7 +64,7 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
       setExecutionState('done');
       setIsExecuting(false);
       setLogLines((prev) => [
-        '--:--:-- [Orbit Engine] ✓ 12/12 checks verified • Deployed to live preview (Design Demo)',
+        '--:--:-- [Orbit Demo] Proposed plan and diffs ready for developer inspection and approval',
         ...prev.slice(0, 6),
       ]);
     }, 5200);
@@ -112,7 +112,7 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
         <div className="sandbox-topbar-right">
           <div className="sandbox-status-indicator">
             <span className="live-dot" />
-            <span>Agent Engine Live (Demo)</span>
+            <span>Approval-First Workspace (Prototype Preview)</span>
           </div>
           <button type="button" onClick={onOpenQuickStart} className="btn-light-secondary">
             1-Click Win/Mac Launch ⚡
@@ -150,7 +150,7 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
                   type="text"
                   value={promptText}
                   onChange={(e) => setPromptText(e.target.value)}
-                  placeholder="Ask the agent to update layout, styles, or tests..."
+                  placeholder="Describe proposed changes for agent planning and review..."
                   style={{ flex: 1, border: 'none', outline: 'none', font: '13px var(--font-body)', background: 'transparent' }}
                   disabled={isExecuting}
                 />
@@ -168,7 +168,7 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
                     cursor: 'pointer',
                   }}
                 >
-                  {isExecuting ? executionState.toUpperCase() : 'Run ✳'}
+                  {isExecuting ? executionState.toUpperCase() : 'Propose Plan ✳'}
                 </button>
               </div>
 
@@ -235,7 +235,7 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
                     <pre style={{ margin: 0, color: '#e2e8f0' }}>
                       {`// Local Express + SQLite Backend API (Demo Preview)
 app.get('/api/v1/products/atlas-refresh', (req, res) => {
-  res.json({ id: 'atlas_01', status: 'verified', hmr: true });
+  res.json({ id: 'atlas_01', status: 'pending_approval', preview: true });
 });`}
                     </pre>
                   )}
@@ -245,8 +245,8 @@ app.get('/api/v1/products/atlas-refresh', (req, res) => {
               {/* Log Stream Box */}
               <div style={{ borderRadius: '10px', border: '1px solid var(--line)', background: '#fff', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--muted)', fontWeight: 700, marginBottom: '6px' }}>
-                  <span>ORBIT AGENT LOG STREAM</span>
-                  <span style={{ color: '#15803d' }}>● SYNCHRONIZED</span>
+                  <span>PROPOSED AGENT AUDIT LOG</span>
+                  <span style={{ color: '#15803d' }}>● PROTOTYPE PREVIEW</span>
                 </div>
                 <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#475569', lineHeight: 1.5, maxHeight: '90px', overflowY: 'auto' }}>
                   {logLines.map((line, idx) => (
@@ -283,7 +283,7 @@ app.get('/api/v1/products/atlas-refresh', (req, res) => {
                 </div>
                 <div style={{ fontSize: '11px', color: '#15803d', fontWeight: 600 }}>
                   <span className="live-dot" style={{ display: 'inline-block', marginRight: '6px' }} />
-                  LIVE PREVIEW: PORT 3000
+                  PROTOTYPE PREVIEW (DESIGN DEMO)
                 </div>
               </div>
 

@@ -112,7 +112,7 @@ export const WaitlistModal: React.FC<WaitlistModalProps> = ({
           </span>
           <h3 id="modal-waitlist-title">Join the Orbit Waitlist</h3>
           <p>
-            Get prioritized access to the agent-first workspace as we open new builder cohorts.
+            Get prioritized access to the approval-first workspace as we open new builder cohorts.
           </p>
         </div>
 

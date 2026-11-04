@@ -128,15 +128,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         },
         {
           step_number: 2,
-          title: 'Gallery components compiled',
-          description: `+142 lines committed to branch ${activeBranch}`,
+          title: 'Proposed diffs prepared',
+          description: `+142 lines staged on branch ${activeBranch} for review`,
           status: 'done',
           time_label: '✓ done',
         },
         {
           step_number: 3,
-          title: 'Headless browser verification',
-          description: 'Automated Playwright checks running across 3 viewports...',
+          title: 'Awaiting developer approval',
+          description: 'Review diffs and preview before applying changes...',
           status: 'active',
           time_label: 'running',
         },
@@ -155,20 +155,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         },
         {
           step_number: 2,
-          title: 'Gallery components compiled',
-          description: `+142 lines committed to branch ${activeBranch}`,
+          title: 'Proposed diffs prepared',
+          description: `+142 lines staged on branch ${activeBranch} for review`,
           status: 'done',
           time_label: '✓ done',
         },
         {
           step_number: 3,
-          title: 'Layout & review passed',
-          description: '12/12 visual checks verified in headless browser',
+          title: 'Ready for developer sign-off',
+          description: 'Developer approval required before code is committed',
           status: 'done',
           time_label: '✓ done',
         },
       ]);
-      setSimulationNotice('✓ Design Demonstration: 3/3 simulated verification checks completed. (No disk files modified)');
+      setSimulationNotice('✓ Design Demonstration: Proposed plan & staged diffs ready for developer approval. (No live repo modified)');
       setIsSimulating(false);
     }, 5400);
 
@@ -212,7 +212,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       {/* Left Copy */}
       <div className="hero-copy">
         <p className="eyebrow">
-          <span className="live-dot" /> THE AGENT-FIRST WORKSPACE
+          <span className="live-dot" /> THE APPROVAL-FIRST WORKSPACE
         </p>
         <h1 id="hero-title">
           Make room
@@ -220,7 +220,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           for <span>what’s next.</span>
         </h1>
         <p className="hero-description">
-          Bring your best ideas. Orbit’s AI agents plan, build, and verify your code in real time while you stay in full control of the outcome.
+          Bring your best ideas. Orbit’s AI proposes architectural plans and isolated code changes, waiting for your review and approval before touching a single file.
         </p>
 
         {/* Action CTAs */}
@@ -246,23 +246,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </a>
         </div>
 
-        {/* Verified Platform Capabilities List */}
-        <div className="hero-proof-list" aria-label="Verified platform capabilities">
+        {/* Approval-First Core Principles */}
+        <div className="hero-proof-list" aria-label="Approval-first core principles">
           <div className="proof-item">
             <span className="proof-check" aria-hidden="true">✓</span>
-            <span>Zero configuration — 1-click startup on Windows & Mac</span>
+            <span>Approval-first workflow — AI proposes changes, you approve every edit</span>
           </div>
           <div className="proof-item">
             <span className="proof-check" aria-hidden="true">✓</span>
-            <span>Autonomous multi-step planning, atomic coding & git isolation</span>
+            <span>Transparent plans & atomic diffs before code modifications</span>
           </div>
           <div className="proof-item">
             <span className="proof-check" aria-hidden="true">✓</span>
-            <span>Headless browser verification with live visual checks</span>
+            <span>Dedicated Git branch isolation with full developer oversight</span>
           </div>
           <div className="proof-item">
             <span className="proof-check" aria-hidden="true">✓</span>
-            <span>Local SQLite persistence (orbit.db) & production cloud exports</span>
+            <span>Zero lock-in — complete source control retention</span>
           </div>
         </div>
       </div>
@@ -706,10 +706,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </button>
             </div>
             <h3 className="cute-card-title">
-              Autonomous Plan for <span>storefront-refresh</span>
+              Proposed Plan for <span>storefront-refresh</span>
             </h3>
             <p className="cute-card-desc">
-              Orbit synthesizes your prompt into verified architectural requirements before touching code:
+              Orbit synthesizes your prompt into transparent steps requiring your approval before touching code:
             </p>
             <div className="cute-steps-grid">
               <div className="cute-step-pill" style={{ background: '#f5f3ff', borderColor: '#ddd6fe' }}>
@@ -762,7 +762,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div className="cute-popover-card" onClick={(e) => e.stopPropagation()}>
             <div className="cute-card-topbar">
               <div className="cute-badge" style={{ background: '#10b981', color: '#fff' }}>
-                <span>✓</span> PLAYWRIGHT VERIFICATION RESULTS (DEMO)
+                <span>✓</span> PROPOSED INSPECTION CHECKS (DEMO)
               </div>
               <button
                 type="button"
@@ -773,10 +773,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </button>
             </div>
             <h3 className="cute-card-title">
-              12/12 Automated Visual Checks <span>Passed</span>
+              Visual & Layout Checks <span>Staged for Review</span>
             </h3>
             <p className="cute-card-desc">
-              Orbit verified your live preview across viewports with zero manual browser testing needed:
+              Prototype preview of planned inspection workflow — tests and checks require your explicit review and sign-off:
             </p>
             <div className="cute-steps-grid">
               <div className="cute-step-pill" style={{ background: '#ecfdf5', borderColor: '#a7f3d0' }}>
