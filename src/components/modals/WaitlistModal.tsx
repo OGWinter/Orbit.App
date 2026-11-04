@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { X, CheckCircle2 } from 'lucide-react';
 import { orbitStore } from '../../services/orbitStore';
 
 interface WaitlistModalProps {
@@ -103,7 +104,7 @@ export const WaitlistModal: React.FC<WaitlistModalProps> = ({
           onClick={onClose}
           aria-label="Close modal"
         >
-          ×
+          <X size={18} aria-hidden="true" />
         </button>
 
         <div className="modal-header">
@@ -123,16 +124,14 @@ export const WaitlistModal: React.FC<WaitlistModalProps> = ({
                 width: '48px',
                 height: '48px',
                 borderRadius: '50%',
-                background: 'var(--mint)',
+                background: 'var(--surface-soft-green, #DCEDE5)',
                 color: '#15803d',
                 display: 'grid',
                 placeItems: 'center',
                 margin: '0 auto 16px',
-                fontSize: '22px',
-                fontWeight: 700,
               }}
             >
-              ✓
+              <CheckCircle2 size={24} />
             </div>
             <h4 style={{ fontSize: '18px', margin: '0 0 8px', fontFamily: 'var(--font-display)' }}>
               Queue Position #{successInfo.queuePosition} Reserved

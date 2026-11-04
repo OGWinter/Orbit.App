@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { orbitStore } from '../../services/orbitStore';
 
 interface FooterProps {
@@ -94,106 +95,97 @@ export const Footer: React.FC<FooterProps> = ({
       <div className="shell footer-columns-grid">
         <div className="footer-col brand-col">
           <a className="brand footer-brand" href="#top" aria-label="Orbit home">
-            <span className="brand-mark" aria-hidden="true">
-              <svg viewBox="0 0 36 36" fill="none" width="32" height="32" style={{ maxWidth: '32px', maxHeight: '32px' }}>
+            <span className="brand-mark" aria-hidden="true" style={{ color: 'var(--orbit-brand-primary, #315CE8)' }}>
+              <svg viewBox="0 0 36 36" fill="none" width="30" height="30" style={{ maxWidth: '30px', maxHeight: '30px' }}>
                 <circle cx="18" cy="18" r="12.5" stroke="currentColor" strokeWidth="1.7" />
                 <ellipse cx="18" cy="18" rx="16" ry="6.3" transform="rotate(-34 18 18)" stroke="currentColor" strokeWidth="1.7" />
-                <circle cx="29.4" cy="8.2" r="2.6" fill="currentColor" />
+                <circle cx="29.4" cy="8.2" r="2.6" fill="var(--orbit-brand-highlight, #D6ED83)" />
               </svg>
             </span>
             <span>orbit</span>
           </a>
-          <p style={{ marginTop: '12px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
-            The approval-first developer workspace. Understand your codebase, plan changes with AI, and review every diff before it touches your code.
+          <p style={{ marginTop: '12px', color: 'var(--muted)', fontSize: '13px', lineHeight: 1.6, maxWidth: '280px' }}>
+            The approval-first AI workspace for engineering teams. Propose plans, isolate diffs, and sign off before code merges.
           </p>
         </div>
 
         <div className="footer-col">
-          <h5>Workspace</h5>
-          <nav aria-label="Workspace links">
-            <button
-              type="button"
-              onClick={onOpenPlatformDemo}
-              className="footer-nav-btn"
-            >
-              Platform Sandbox ↗
-            </button>
-            <a href="#workflow">How it works</a>
-            <a href="#for-builders">Persona architecture</a>
-            <button
-              type="button"
-              onClick={onOpenQuickStart}
-              className="footer-nav-btn"
-              style={{ color: '#10b981' }}
-            >
-              1-Click Launchers ⚡
-            </button>
-          </nav>
+          <h5>Product</h5>
+          <ul>
+            <li>
+              <a href="#workflow">How It Works</a>
+            </li>
+            <li>
+              <button type="button" onClick={onOpenPlatformDemo}>
+                <span>Platform Sandbox</span>
+                <ArrowUpRight size={11} strokeWidth={2} style={{ display: 'inline', marginLeft: '4px' }} aria-hidden="true" />
+              </button>
+            </li>
+            <li>
+              <button type="button" onClick={onOpenQuickStart}>
+                <span>Desktop QuickStart</span>
+              </button>
+            </li>
+            <li>
+              <a href="#for-builders">For Builders</a>
+            </li>
+          </ul>
         </div>
 
         <div className="footer-col">
-          <h5>Architecture</h5>
-          <nav aria-label="Architecture links">
-            <a href="#workflow">Outcome Synthesis</a>
-            <a href="#workflow">Branch Isolation</a>
-            <a href="#workflow">Review & Approval</a>
-            <a href="#for-builders">Full-Stack Sync</a>
-          </nav>
+          <h5>Demonstrations</h5>
+          <ul>
+            <li>
+              <button type="button" onClick={onOpenAdmin}>
+                <span>Mission Control</span>
+                <ArrowUpRight size={11} strokeWidth={2} style={{ display: 'inline', marginLeft: '4px' }} aria-hidden="true" />
+              </button>
+            </li>
+            <li>
+              {onOpenSignIn ? (
+                <button type="button" onClick={onOpenSignIn}>
+                  <span>User Login / Auth</span>
+                </button>
+              ) : (
+                <a href="/login">User Login / Auth</a>
+              )}
+            </li>
+            <li>
+              <a href="/workspace">Developer Workspace</a>
+            </li>
+          </ul>
         </div>
 
-        <div className="footer-col developer-col">
-          <h5>Developer & Admin Tools</h5>
-          <nav aria-label="Developer links">
-            <button
-              type="button"
-              onClick={onOpenAdmin}
-              className="footer-admin-link"
-              id="btn-footer-admin-login"
-            >
-              <span>◈</span> Mission Control
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (onOpenSignIn) onOpenSignIn();
-                else {
-                  window.history.pushState(null, '', '/login');
-                  window.dispatchEvent(new PopStateEvent('popstate'));
-                }
-              }}
-              className="footer-nav-btn"
-              style={{ color: '#a5b4fc', marginTop: '4px' }}
-            >
-              Developer Sign In ↗
-            </button>
-            <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#64748b', lineHeight: 1.4 }}>
-              Internal access for waitlist review, approval dispatches, and preview database controls.
-            </p>
-            <button
-              type="button"
-              onClick={onOpenQuickStart}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#94a3b8',
-                fontSize: '11px',
-                padding: '4px 0',
-                textAlign: 'left',
-                cursor: 'pointer',
-              }}
-            >
-              Download start.bat / start.sh
-            </button>
-          </nav>
+        <div className="footer-col">
+          <h5>Company</h5>
+          <ul>
+            <li>
+              <a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Notice: Orbit is currently in client-side preview mode.'); }}>
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a href="#terms" onClick={(e) => { e.preventDefault(); alert('Terms of Service: Preview edition of Orbit developer platform.'); }}>
+                Terms of Service
+              </a>
+            </li>
+            <li>
+              <a href="#security" onClick={(e) => { e.preventDefault(); alert('Security: Full RBAC and cryptographic audit trails active.'); }}>
+                Security Architecture
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
 
-      {/* Footer Bottom Bar */}
+      {/* Bottom Sub-Footer */}
       <div className="shell footer-bottom">
-        <span>© 2026 Orbit Studio • All Rights Reserved</span>
-        <span>
-          Built for what’s next <i>✳</i>
-        </span>
+        <div>
+          © {new Date().getFullYear()} Orbit Studio • Precision & Momentum
+        </div>
+        <div>
+          Designed for developers who stay in control
+        </div>
       </div>
     </footer>
   );

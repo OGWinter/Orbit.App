@@ -1,4 +1,22 @@
 import React, { useState, useRef } from 'react';
+import {
+  ArrowUpRight,
+  Zap,
+  ArrowDown,
+  Check,
+  CheckCircle2,
+  Sparkles,
+  MoreHorizontal,
+  Layers,
+  Search,
+  Settings,
+  GitBranch,
+  Terminal,
+  ExternalLink,
+  Code2,
+  X,
+  Play,
+} from 'lucide-react';
 import { AgentStep, WorkspaceTab, AgentSimulationStage, FileDiffItem } from '../../types/orbit';
 
 interface HeroSectionProps {
@@ -231,37 +249,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             onClick={onOpenPlatformDemo}
             style={{ cursor: 'pointer' }}
           >
-            Explore the platform <span aria-hidden="true">↗</span>
+            Explore the platform <ArrowUpRight size={15} aria-hidden="true" />
           </button>
           <button
             type="button"
             className="button"
             onClick={onOpenQuickStart}
-            style={{ cursor: 'pointer', background: 'var(--lime)', color: '#171820', fontWeight: 700 }}
+            style={{ cursor: 'pointer', background: 'var(--brand-highlight)', color: 'var(--surface-dark)', fontWeight: 700 }}
           >
-            Start on Win / Mac <span>⚡</span>
+            Start on Win / Mac <Zap size={14} fill="currentColor" />
           </button>
           <a className="text-link" href="#workflow">
-            See how it works <span aria-hidden="true">↓</span>
+            See how it works <ArrowDown size={14} aria-hidden="true" />
           </a>
         </div>
 
         {/* Approval-First Core Principles */}
         <div className="hero-proof-list" aria-label="Approval-first core principles">
           <div className="proof-item">
-            <span className="proof-check" aria-hidden="true">✓</span>
+            <Check size={14} className="proof-check" aria-hidden="true" />
             <span>Approval-first workflow — AI proposes changes, you approve every edit</span>
           </div>
           <div className="proof-item">
-            <span className="proof-check" aria-hidden="true">✓</span>
+            <Check size={14} className="proof-check" aria-hidden="true" />
             <span>Transparent plans & atomic diffs before code modifications</span>
           </div>
           <div className="proof-item">
-            <span className="proof-check" aria-hidden="true">✓</span>
+            <Check size={14} className="proof-check" aria-hidden="true" />
             <span>Dedicated Git branch isolation with full developer oversight</span>
           </div>
           <div className="proof-item">
-            <span className="proof-check" aria-hidden="true">✓</span>
+            <Check size={14} className="proof-check" aria-hidden="true" />
             <span>Zero lock-in — complete source control retention</span>
           </div>
         </div>
@@ -275,7 +293,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {floatingToast && (
           <div className="hero-floating-notice">
-            <span>◈</span> {floatingToast}
+            <Sparkles size={13} style={{ color: 'var(--brand-highlight)' }} /> {floatingToast}
           </div>
         )}
 
@@ -295,7 +313,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <i />
             </div>
             <div className="window-path">
-              <span className="path-icon">◈</span> atlas / storefront-refresh
+              <span className="path-icon"><Terminal size={12} /></span> atlas / storefront-refresh
             </div>
             <button
               type="button"
@@ -304,7 +322,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               aria-label="Workspace Actions Menu"
               title="Workspace actions"
             >
-              •••
+              <MoreHorizontal size={14} />
             </button>
 
             {/* Quick dropdown menu */}
@@ -317,7 +335,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     runSimulation();
                   }}
                 >
-                  <span>✳</span> Re-run Agent Simulation
+                  <Sparkles size={13} style={{ color: 'var(--brand)' }} /> Re-run Agent Simulation
                 </button>
                 <button
                   type="button"
@@ -326,7 +344,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     setActivePopover('plan');
                   }}
                 >
-                  <span>▤</span> View Architecture Plan
+                  <Layers size={13} style={{ color: 'var(--brand)' }} /> View Architecture Plan
                 </button>
                 <button
                   type="button"
@@ -335,7 +353,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     setActivePopover('verify');
                   }}
                 >
-                  <span>✓</span> Inspect Playwright Test Suite
+                  <CheckCircle2 size={13} style={{ color: '#15803d' }} /> Inspect Playwright Test Suite
                 </button>
                 <button
                   type="button"
@@ -344,7 +362,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     onOpenPlatformDemo();
                   }}
                 >
-                  <span>↗</span> Open Full Sandbox Workspace
+                  <ExternalLink size={13} /> Open Full Sandbox Workspace
                 </button>
               </div>
             )}
@@ -359,8 +377,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 className="rail-logo-btn"
                 onClick={() => setActiveRailTab('editor')}
                 title="Orbit Home"
+                aria-label="Orbit Home"
               >
-                ◉
+                <span style={{ display: 'inline-block', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--brand)', border: '2px solid var(--brand-highlight)' }} />
               </button>
               <button
                 type="button"
@@ -368,7 +387,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 onClick={() => setActiveRailTab('editor')}
                 title="Editor & Agent Prompt (⌘)"
               >
-                ⌘
+                <Code2 size={16} />
               </button>
               <button
                 type="button"
@@ -376,7 +395,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 onClick={() => setActiveRailTab('plan')}
                 title="Architecture & Plan Specs (▤)"
               >
-                ▤
+                <Layers size={16} />
               </button>
               <button
                 type="button"
@@ -384,7 +403,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 onClick={() => setActiveRailTab('search')}
                 title="Search Codebase & AST (⌕)"
               >
-                ⌕
+                <Search size={16} />
               </button>
               <button
                 type="button"
@@ -392,7 +411,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 onClick={() => setActiveRailTab('settings')}
                 title="Workspace Agent Settings (⚙)"
               >
-                ⚙
+                <Settings size={16} />
               </button>
             </aside>
 
@@ -409,7 +428,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   onClick={cycleBranch}
                   title="Click to cycle active git branch"
                 >
-                  <span /> {activeBranch} <i>⇄</i>
+                  <GitBranch size={13} /> {activeBranch}
                 </button>
               </div>
 
@@ -417,8 +436,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               {activeRailTab === 'editor' && (
                 <>
                   <div className="task-prompt-interactive">
-                    <span className="sparkle" style={{ color: 'var(--violet)', fontSize: '13px' }}>
-                      ✳
+                    <span className="sparkle" style={{ color: 'var(--brand)', display: 'flex', alignItems: 'center' }}>
+                      <Sparkles size={14} />
                     </span>
                     <input
                       type="text"
@@ -450,7 +469,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         </>
                       ) : (
                         <>
-                          Run <span>✳</span>
+                          Run <Zap size={12} fill="currentColor" />
                         </>
                       )}
                     </button>
@@ -459,20 +478,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   {simulationNotice && (
                     <div
                       style={{
-                        background: '#f0fdf4',
+                        background: 'var(--surface-soft-green)',
                         border: '1px solid #bbf7d0',
                         borderRadius: '6px',
-                        padding: '5px 8px',
-                        fontSize: '8px',
+                        padding: '6px 10px',
+                        fontSize: '9px',
                         color: '#15803d',
                         marginBottom: '8px',
                         fontWeight: 600,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px',
+                        gap: '6px',
                       }}
                     >
-                      {simulationNotice}
+                      <CheckCircle2 size={13} style={{ flexShrink: 0 }} />
+                      <span>{simulationNotice}</span>
                     </div>
                   )}
 
@@ -480,7 +500,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     <span>AGENT ORCHESTRATION TIMELINE (SIMULATION)</span>
                     <span>
                       {isSimulating ? (
-                        <span style={{ color: 'var(--violet)', fontWeight: 700 }}>
+                        <span style={{ color: 'var(--brand)', fontWeight: 700 }}>
                           STAGE: {simulationStage.toUpperCase()}
                         </span>
                       ) : (
@@ -495,7 +515,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     {agentSteps.map((step, idx) => (
                       <div key={idx} className={`agent-step ${step.status}`}>
                         <span className="step-symbol">
-                          {step.status === 'done' ? '✓' : step.status === 'active' ? <i /> : '○'}
+                          {step.status === 'done' ? <Check size={11} strokeWidth={3} /> : step.status === 'active' ? <i /> : '○'}
                         </span>
                         <div>
                           <strong>{step.title}</strong>
@@ -552,7 +572,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               {activeRailTab === 'search' && (
                 <div className="hero-rail-tab-content">
                   <div className="search-bar-row">
-                    <span>⌕</span>
+                    <Search size={14} style={{ color: 'var(--muted)', flexShrink: 0 }} />
                     <input
                       type="text"
                       value={searchQuery}
@@ -665,7 +685,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               className="btn-open-preview-link"
               title="Open Sandbox"
             >
-              ↗ Open
+              <ArrowUpRight size={13} /> Open
             </button>
           </div>
         </div>
@@ -677,7 +697,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           onClick={() => setActivePopover('plan')}
           title="Click to view Architecture Plan"
         >
-          <span>✳</span> Plan
+          <Layers size={13} /> Plan
         </button>
         <button
           type="button"
@@ -685,7 +705,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           onClick={() => setActivePopover('verify')}
           title="Click to view Browser Verification Results"
         >
-          <span>✓</span> Verify
+          <CheckCircle2 size={13} /> Verify
         </button>
       </div>
 
@@ -694,15 +714,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="cute-popover-overlay" onClick={() => setActivePopover(null)} role="dialog">
           <div className="cute-popover-card" onClick={(e) => e.stopPropagation()}>
             <div className="cute-card-topbar">
-              <div className="cute-badge" style={{ background: 'var(--violet)', color: '#fff' }}>
-                <span>✳</span> ORBIT ARCHITECTURE PLAN (DEMO)
+              <div className="cute-badge" style={{ background: 'var(--brand)', color: '#fff' }}>
+                <Layers size={13} /> ORBIT ARCHITECTURE PLAN (DEMO)
               </div>
               <button
                 type="button"
                 className="cute-close-btn"
                 onClick={() => setActivePopover(null)}
+                aria-label="Close Plan Dialog"
               >
-                ✕
+                <X size={16} />
               </button>
             </div>
             <h3 className="cute-card-title">
@@ -712,8 +733,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               Orbit synthesizes your prompt into transparent steps requiring your approval before touching code:
             </p>
             <div className="cute-steps-grid">
-              <div className="cute-step-pill" style={{ background: '#f5f3ff', borderColor: '#ddd6fe' }}>
-                <div className="cute-step-icon" style={{ background: 'var(--violet)', color: '#fff' }}>
+              <div className="cute-step-pill" style={{ background: 'var(--surface-soft-blue)', borderColor: 'var(--border)' }}>
+                <div className="cute-step-icon" style={{ background: 'var(--brand)', color: '#fff' }}>
                   1
                 </div>
                 <div className="cute-step-content">
@@ -721,8 +742,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   <p>Refactors ProductGallery into decoupled ImageCarousel and SpecSummary.</p>
                 </div>
               </div>
-              <div className="cute-step-pill" style={{ background: '#f5f3ff', borderColor: '#ddd6fe' }}>
-                <div className="cute-step-icon" style={{ background: 'var(--violet)', color: '#fff' }}>
+              <div className="cute-step-pill" style={{ background: 'var(--surface-soft-blue)', borderColor: 'var(--border)' }}>
+                <div className="cute-step-icon" style={{ background: 'var(--brand)', color: '#fff' }}>
                   2
                 </div>
                 <div className="cute-step-content">
@@ -730,8 +751,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   <p>Applies relaxed ambient padding (--gallery-gap: 32px) and warm sand gradients.</p>
                 </div>
               </div>
-              <div className="cute-step-pill" style={{ background: '#f5f3ff', borderColor: '#ddd6fe' }}>
-                <div className="cute-step-icon" style={{ background: 'var(--violet)', color: '#fff' }}>
+              <div className="cute-step-pill" style={{ background: 'var(--surface-soft-blue)', borderColor: 'var(--border)' }}>
+                <div className="cute-step-icon" style={{ background: 'var(--brand)', color: '#fff' }}>
                   3
                 </div>
                 <div className="cute-step-content">
@@ -749,7 +770,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   runSimulation();
                 }}
               >
-                Run Simulation Now ✳
+                Run Simulation Now <Play size={13} fill="currentColor" />
               </button>
             </div>
           </div>
@@ -761,15 +782,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="cute-popover-overlay" onClick={() => setActivePopover(null)} role="dialog">
           <div className="cute-popover-card" onClick={(e) => e.stopPropagation()}>
             <div className="cute-card-topbar">
-              <div className="cute-badge" style={{ background: '#10b981', color: '#fff' }}>
-                <span>✓</span> PROPOSED INSPECTION CHECKS (DEMO)
+              <div className="cute-badge" style={{ background: '#15803d', color: '#fff' }}>
+                <CheckCircle2 size={13} /> PROPOSED INSPECTION CHECKS (DEMO)
               </div>
               <button
                 type="button"
                 className="cute-close-btn"
                 onClick={() => setActivePopover(null)}
+                aria-label="Close Verification Dialog"
               >
-                ✕
+                <X size={16} />
               </button>
             </div>
             <h3 className="cute-card-title">
@@ -779,27 +801,27 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               Prototype preview of planned inspection workflow — tests and checks require your explicit review and sign-off:
             </p>
             <div className="cute-steps-grid">
-              <div className="cute-step-pill" style={{ background: '#ecfdf5', borderColor: '#a7f3d0' }}>
-                <div className="cute-step-icon" style={{ background: '#10b981', color: '#fff' }}>
-                  ✓
+              <div className="cute-step-pill" style={{ background: 'var(--surface-soft-green)', borderColor: '#a7f3d0' }}>
+                <div className="cute-step-icon" style={{ background: '#15803d', color: '#fff' }}>
+                  <Check size={14} />
                 </div>
                 <div className="cute-step-content">
                   <strong>Viewport Layout Stability</strong>
                   <p>Desktop (1280px), Tablet (768px), and Mobile (390px) rendered with 0 CLS.</p>
                 </div>
               </div>
-              <div className="cute-step-pill" style={{ background: '#ecfdf5', borderColor: '#a7f3d0' }}>
-                <div className="cute-step-icon" style={{ background: '#10b981', color: '#fff' }}>
-                  ✓
+              <div className="cute-step-pill" style={{ background: 'var(--surface-soft-green)', borderColor: '#a7f3d0' }}>
+                <div className="cute-step-icon" style={{ background: '#15803d', color: '#fff' }}>
+                  <Check size={14} />
                 </div>
                 <div className="cute-step-content">
                   <strong>WCAG 2.1 AA Accessibility</strong>
                   <p>Color contrast ratio: 8.4:1 on warm sand swatches, focus rings active.</p>
                 </div>
               </div>
-              <div className="cute-step-pill" style={{ background: '#ecfdf5', borderColor: '#a7f3d0' }}>
-                <div className="cute-step-icon" style={{ background: '#10b981', color: '#fff' }}>
-                  ✓
+              <div className="cute-step-pill" style={{ background: 'var(--surface-soft-green)', borderColor: '#a7f3d0' }}>
+                <div className="cute-step-icon" style={{ background: '#15803d', color: '#fff' }}>
+                  <Check size={14} />
                 </div>
                 <div className="cute-step-content">
                   <strong>Zero Console Errors</strong>
@@ -811,10 +833,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <button
                 type="button"
                 className="cute-primary-btn"
-                style={{ background: '#10b981' }}
+                style={{ background: '#15803d' }}
                 onClick={() => setActivePopover(null)}
               >
-                Close Verification Suite ✓
+                Close Verification Suite <Check size={13} />
               </button>
             </div>
           </div>

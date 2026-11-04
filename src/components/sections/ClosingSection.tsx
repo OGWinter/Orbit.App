@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowUpRight, ArrowRight } from 'lucide-react';
 
 interface ClosingSectionProps {
   onOpenWaitlist: () => void;
@@ -14,7 +15,6 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({
       <div className="shell closing-inner">
         <div className="closing-orbit" aria-hidden="true">
           <span />
-          <i />
         </div>
         <p className="eyebrow eyebrow-light">THE NEXT MOVE IS YOURS</p>
         <h2 id="closing-title">
@@ -29,14 +29,16 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({
             type="button"
             onClick={onOpenWaitlist}
           >
-            Join Early Access <span aria-hidden="true">↗</span>
+            <span>Join Early Access</span>
+            <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
           </button>
           <button
             className="button button-light btn-open-inquiry"
             type="button"
             onClick={onOpenInquiry}
           >
-            Request Team Demo <span aria-hidden="true">→</span>
+            <span>Request Team Demo</span>
+            <ArrowRight size={14} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -45,4 +47,3 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({
 };
 
 export default ClosingSection;
-

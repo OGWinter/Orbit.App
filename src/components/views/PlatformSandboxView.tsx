@@ -1,4 +1,16 @@
 import React, { useState, useRef } from 'react';
+import {
+  Monitor,
+  Tablet,
+  Smartphone,
+  Sparkles,
+  ArrowUpRight,
+  Zap,
+  Check,
+  RotateCcw,
+  ArrowLeft,
+  Radio,
+} from 'lucide-react';
 
 interface PlatformSandboxViewProps {
   onBackToWebsite: () => void;
@@ -83,16 +95,22 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
       {/* Top Bar */}
       <header className="sandbox-light-topbar">
         <div className="sandbox-topbar-left">
-          <button type="button" onClick={onBackToWebsite} className="btn-light-back">
-            <span>←</span> Back to Homepage
+          <button type="button" onClick={onBackToWebsite} className="btn-light-back" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
+            <span>Back to Homepage</span>
           </button>
           <div className="sandbox-brand-group">
-            <span className="brand-mark">◈</span>
+            <span className="brand-mark" style={{ color: 'var(--violet)' }}>
+              <Radio size={16} strokeWidth={2} aria-hidden="true" />
+            </span>
             <span className="sandbox-brand-name">orbit</span>
             <span className="sandbox-paper-pill">PLATFORM SANDBOX (DEMO)</span>
           </div>
           <div className="sandbox-path-pill">
-            <span className="path-icon">◈</span> atlas / storefront-refresh
+            <span className="path-icon" style={{ color: 'var(--violet)' }}>
+              <Radio size={12} strokeWidth={2} aria-hidden="true" />
+            </span>
+            <span>atlas / storefront-refresh</span>
           </div>
           <div className="sandbox-branch-switcher">
             <label htmlFor="sandbox-branch-select">Branch:</label>
@@ -114,11 +132,13 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
             <span className="live-dot" />
             <span>Approval-First Workspace (Prototype Preview)</span>
           </div>
-          <button type="button" onClick={onOpenQuickStart} className="btn-light-secondary">
-            1-Click Win/Mac Launch ⚡
+          <button type="button" onClick={onOpenQuickStart} className="btn-light-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span>1-Click Win/Mac Launch</span>
+            <Zap size={13} strokeWidth={2} aria-hidden="true" />
           </button>
-          <button type="button" onClick={onOpenWaitlist} className="btn-light-primary">
-            Get Early Access ↗
+          <button type="button" onClick={onOpenWaitlist} className="btn-light-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span>Get Early Access</span>
+            <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </header>
@@ -134,7 +154,10 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
               <i />
             </div>
             <div className="window-path">
-              <span className="path-icon">◈</span> ./projects/atlas-storefront/components/ProductGallery.tsx
+              <span className="path-icon" style={{ color: 'var(--violet)' }}>
+                <Radio size={12} strokeWidth={2} aria-hidden="true" />
+              </span>
+              <span>./projects/atlas-storefront/components/ProductGallery.tsx</span>
             </div>
             <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Interactive Simulation</span>
           </div>
@@ -145,7 +168,9 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
             <div style={{ padding: '20px', borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: '16px', background: '#fafbfc' }}>
               {/* Task Prompt Box */}
               <div style={{ display: 'flex', gap: '8px', background: '#fff', padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--line)' }}>
-                <span style={{ color: 'var(--violet)', fontSize: '16px', lineHeight: '32px' }}>✳</span>
+                <span style={{ color: 'var(--violet)', display: 'grid', placeItems: 'center' }}>
+                  <Sparkles size={16} strokeWidth={2} aria-hidden="true" />
+                </span>
                 <input
                   type="text"
                   value={promptText}
@@ -166,9 +191,13 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
                     fontWeight: 700,
                     fontSize: '12px',
                     cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
                   }}
                 >
-                  {isExecuting ? executionState.toUpperCase() : 'Propose Plan ✳'}
+                  <span>{isExecuting ? executionState.toUpperCase() : 'Propose Plan'}</span>
+                  <Sparkles size={12} strokeWidth={2} aria-hidden="true" />
                 </button>
               </div>
 
@@ -275,9 +304,27 @@ app.get('/api/v1/products/atlas-refresh', (req, res) => {
                         fontSize: '11px',
                         fontWeight: 600,
                         cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
                       }}
                     >
-                      {v === 'desktop' ? '🖥️ Desktop' : v === 'tablet' ? '📱 Tablet' : '📱 Mobile'}
+                      {v === 'desktop' ? (
+                        <>
+                          <Monitor size={12} strokeWidth={2} aria-hidden="true" />
+                          <span>Desktop</span>
+                        </>
+                      ) : v === 'tablet' ? (
+                        <>
+                          <Tablet size={12} strokeWidth={2} aria-hidden="true" />
+                          <span>Tablet</span>
+                        </>
+                      ) : (
+                        <>
+                          <Smartphone size={12} strokeWidth={2} aria-hidden="true" />
+                          <span>Mobile</span>
+                        </>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -313,7 +360,7 @@ app.get('/api/v1/products/atlas-refresh', (req, res) => {
                   <div style={{ flex: 1, background: '#fff', border: '1px solid var(--line)', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', color: '#64748b' }}>
                     https://atlas-storefront.local:3000/products/horizon
                   </div>
-                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>↺</span>
+                  <RotateCcw size={12} color="#94a3b8" aria-hidden="true" />
                 </div>
 
                 {/* E-Commerce Product Layout */}
@@ -445,8 +492,12 @@ app.get('/api/v1/products/atlas-refresh', (req, res) => {
 
                 {/* Browser Verification Footer */}
                 <div style={{ padding: '8px 16px', background: '#f8fafc', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#15803d', fontWeight: 600 }}>
-                  <span>✓ 0 Layout Shifts (CLS)</span>
-                  <span>✓ AA Contrast Passed</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Check size={12} strokeWidth={2} /> 0 Layout Shifts (CLS)
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Check size={12} strokeWidth={2} /> AA Contrast Passed
+                  </span>
                 </div>
               </div>
             </div>

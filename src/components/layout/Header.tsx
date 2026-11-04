@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ArrowUpRight, ArrowRight, Radio, Zap, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface HeaderProps {
@@ -64,11 +65,11 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="header-inner shell">
         {/* Brand Logo */}
         <a href="/" className="brand" onClick={handleBrandClick} aria-label="Orbit home">
-          <span className="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 36 36" fill="none" width="32" height="32" style={{ maxWidth: '32px', maxHeight: '32px' }}>
+          <span className="brand-mark" aria-hidden="true" style={{ color: 'var(--orbit-brand-primary, #315CE8)' }}>
+            <svg viewBox="0 0 36 36" fill="none" width="30" height="30" style={{ maxWidth: '30px', maxHeight: '30px' }}>
               <circle cx="18" cy="18" r="12.5" stroke="currentColor" strokeWidth="1.7" />
               <ellipse cx="18" cy="18" rx="16" ry="6.3" transform="rotate(-34 18 18)" stroke="currentColor" strokeWidth="1.7" />
-              <circle cx="29.4" cy="8.2" r="2.6" fill="currentColor" />
+              <circle cx="29.4" cy="8.2" r="2.6" fill="var(--orbit-brand-highlight, #D6ED83)" />
             </svg>
           </span>
           <span>orbit</span>
@@ -110,7 +111,8 @@ export const Header: React.FC<HeaderProps> = ({
                   onOpenWaitlist();
                 }}
               >
-                Join Waitlist <span aria-hidden="true">↗</span>
+                <span>Join Waitlist</span>
+                <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
               </button>
             </>
           ) : (
@@ -122,17 +124,9 @@ export const Header: React.FC<HeaderProps> = ({
                   closeMenu();
                   onOpenPlatformDemo();
                 }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  color: 'inherit',
-                  padding: 0,
-                  fontSize: '13px',
-                }}
               >
-                Platform Sandbox ↗
+                <span>Platform Sandbox</span>
+                <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
               </button>
 
               <a href="#workflow" onClick={closeMenu}>
@@ -150,17 +144,9 @@ export const Header: React.FC<HeaderProps> = ({
                   closeMenu();
                   onOpenAdmin();
                 }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  color: 'inherit',
-                  padding: 0,
-                  fontSize: '13px',
-                }}
               >
-                Mission Control ◈
+                <span>Mission Control</span>
+                <Radio size={13} strokeWidth={2} aria-hidden="true" />
               </button>
 
               <button
@@ -172,18 +158,10 @@ export const Header: React.FC<HeaderProps> = ({
                 }}
                 style={{
                   color: '#059669',
-                  fontWeight: 600,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  fontSize: '13px',
                 }}
               >
-                Start on Win / Mac ⚡
+                <span>Start on Win / Mac</span>
+                <Zap size={13} strokeWidth={2} aria-hidden="true" />
               </button>
 
               {/* Authentication Status in Header */}
@@ -193,36 +171,12 @@ export const Header: React.FC<HeaderProps> = ({
                     type="button"
                     className="nav-link btn-open-workspace"
                     onClick={handleWorkspaceClick}
-                    style={{
-                      color: 'var(--violet-dark, #5746dc)',
-                      fontWeight: 700,
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: 0,
-                      fontSize: '13px',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
                   >
-                    Open Workspace →
+                    <span>Open Workspace</span>
+                    <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
                   </button>
                   <span
                     className="nav-user-badge"
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      color: 'var(--ink, #16171d)',
-                      background: 'rgba(99, 102, 241, 0.12)',
-                      border: '1px solid rgba(99, 102, 241, 0.25)',
-                      padding: '4px 10px',
-                      borderRadius: '999px',
-                      maxWidth: '180px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
                     title={user.email}
                   >
                     ● {userDisplayName}
@@ -231,17 +185,9 @@ export const Header: React.FC<HeaderProps> = ({
                     type="button"
                     className="nav-link btn-sign-out"
                     onClick={handleSignOut}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontWeight: 600,
-                      color: '#ef4444',
-                      padding: 0,
-                      fontSize: '13px',
-                    }}
                   >
-                    Sign out
+                    <LogOut size={13} strokeWidth={2} aria-hidden="true" />
+                    <span>Sign out</span>
                   </button>
                 </>
               ) : (
@@ -250,15 +196,6 @@ export const Header: React.FC<HeaderProps> = ({
                     type="button"
                     className="nav-link btn-sign-in"
                     onClick={handleSignInClick}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontWeight: 600,
-                      color: 'inherit',
-                      padding: 0,
-                      fontSize: '13px',
-                    }}
                   >
                     Sign in
                   </button>
@@ -273,7 +210,8 @@ export const Header: React.FC<HeaderProps> = ({
                   onOpenWaitlist();
                 }}
               >
-                Get started <span aria-hidden="true">↗</span>
+                <span>Get started</span>
+                <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
               </button>
             </>
           )}

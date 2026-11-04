@@ -1,4 +1,5 @@
 import React from 'react';
+import { Workflow, Code2, CheckCircle2, ArrowUpRight } from 'lucide-react';
 
 interface PlatformSectionProps {
   onOpenPlatformDemo: () => void;
@@ -23,17 +24,27 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
         {/* Card 01: Orchestrate */}
         <article className="feature-card feature-card-dark">
           <div className="feature-topline">
-            <span className="feature-icon icon-orchestrate">✳</span>
+            <span className="feature-icon icon-orchestrate" aria-hidden="true">
+              <Workflow size={13} strokeWidth={2} />
+            </span>
             <span>01 / ORCHESTRATE</span>
           </div>
           <div className="constellation" aria-hidden="true">
             <span className="constellation-line line-a" />
             <span className="constellation-line line-b" />
             <span className="constellation-line line-c" />
-            <span className="constellation-node node-core">✳</span>
-            <span className="constellation-node node-one">⌘</span>
-            <span className="constellation-node node-two">▤</span>
-            <span className="constellation-node node-three">✓</span>
+            <span className="constellation-node node-core">
+              <Workflow size={18} strokeWidth={2} />
+            </span>
+            <span className="constellation-node node-one">
+              <Code2 size={12} strokeWidth={2} />
+            </span>
+            <span className="constellation-node node-two" style={{ fontSize: '10px' }}>
+              schema
+            </span>
+            <span className="constellation-node node-three">
+              <CheckCircle2 size={13} strokeWidth={2} />
+            </span>
           </div>
           <h3>
             Keep every agent
@@ -49,14 +60,17 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
             onClick={onOpenPlatformDemo}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
-            See orchestration <span aria-hidden="true">↗</span>
+            <span>See orchestration</span>
+            <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
           </button>
         </article>
 
         {/* Card 02: Create */}
         <article className="feature-card feature-card-lilac">
           <div className="feature-topline">
-            <span className="feature-icon icon-editor">⌘</span>
+            <span className="feature-icon icon-editor" aria-hidden="true">
+              <Code2 size={13} strokeWidth={2} />
+            </span>
             <span>02 / CREATE</span>
           </div>
           <div className="code-art" aria-hidden="true">
@@ -93,14 +107,17 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
             onClick={onOpenPlatformDemo}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
-            See editing preview <span aria-hidden="true">↗</span>
+            <span>See editing preview</span>
+            <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
           </button>
         </article>
 
         {/* Card 03: Verify */}
         <article className="feature-card feature-card-mint">
           <div className="feature-topline">
-            <span className="feature-icon icon-browser">✓</span>
+            <span className="feature-icon icon-browser" aria-hidden="true">
+              <CheckCircle2 size={13} strokeWidth={2} />
+            </span>
             <span>03 / APPROVE</span>
           </div>
           <div className="browser-art" aria-hidden="true">
@@ -139,7 +156,8 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
             onClick={onOpenPlatformDemo}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
-            See approval flow <span aria-hidden="true">↗</span>
+            <span>See approval flow</span>
+            <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
           </button>
         </article>
       </div>
@@ -148,4 +166,3 @@ export const PlatformSection: React.FC<PlatformSectionProps> = ({ onOpenPlatform
 };
 
 export default PlatformSection;
-

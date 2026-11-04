@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { X, ShieldCheck, Terminal, Laptop, Copy, Check } from 'lucide-react';
 
 interface QuickStartModalProps {
   isOpen: boolean;
@@ -53,7 +54,7 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({ isOpen, onClos
           onClick={onClose}
           aria-label="Close modal"
         >
-          ×
+          <X size={18} aria-hidden="true" />
         </button>
 
         <div className="modal-header">
@@ -70,18 +71,18 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({ isOpen, onClos
         <div
           style={{
             background: 'var(--mint)',
-            border: '1px solid #bbf7d0',
+            border: '1px solid #c2e2d3',
             borderRadius: '10px',
             padding: '12px 16px',
             marginBottom: '20px',
             fontSize: '13px',
-            color: '#14532d',
+            color: '#065f46',
             display: 'flex',
             alignItems: 'flex-start',
             gap: '10px',
           }}
         >
-          <span style={{ fontSize: '18px', lineHeight: 1 }}>🛡️</span>
+          <ShieldCheck size={20} strokeWidth={2} style={{ flexShrink: 0, marginTop: '1px' }} aria-hidden="true" />
           <div>
             <strong>Strictly Project-Isolated:</strong> Dependencies are scoped solely to your repository's local worktree. Zero global modifications will be made to your computer.
           </div>
@@ -110,7 +111,7 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({ isOpen, onClos
           >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ fontSize: '20px' }}>🪟</span>
+                <Terminal size={18} color="var(--violet)" aria-hidden="true" />
                 <strong style={{ fontSize: '15px', fontFamily: 'var(--font-display)' }}>
                   Windows (CMD / PowerShell)
                 </strong>
@@ -121,25 +122,42 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({ isOpen, onClos
               <div
                 style={{
                   background: 'var(--night)',
-                  color: 'var(--lime)',
+                  color: '#FFFFFF',
                   padding: '10px 12px',
                   borderRadius: '8px',
-                  font: '12px monospace',
-                  marginBottom: '12px',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px',
                   wordBreak: 'break-all',
                 }}
               >
-                {winCommand}
+                <span>{winCommand}</span>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(winCommand, 'win')}
+                  style={{
+                    background: copiedKey === 'win' ? 'var(--lime)' : 'rgba(255, 255, 255, 0.15)',
+                    color: copiedKey === 'win' ? 'var(--ink)' : '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '4px 8px',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    flexShrink: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  {copiedKey === 'win' ? <Check size={12} strokeWidth={2} /> : <Copy size={12} strokeWidth={2} />}
+                  <span>{copiedKey === 'win' ? 'Copied' : 'Copy'}</span>
+                </button>
               </div>
             </div>
-            <button
-              type="button"
-              className="button button-dark"
-              onClick={() => copyToClipboard(winCommand, 'win')}
-              style={{ width: '100%', minHeight: '40px', fontSize: '12px' }}
-            >
-              {copiedKey === 'win' ? '✓ Copied Command!' : 'Copy Windows Command'}
-            </button>
           </div>
 
           {/* Mac Option */}
@@ -156,41 +174,58 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({ isOpen, onClos
           >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ fontSize: '20px' }}>🍎</span>
+                <Laptop size={18} color="var(--violet)" aria-hidden="true" />
                 <strong style={{ fontSize: '15px', fontFamily: 'var(--font-display)' }}>
                   macOS (Terminal / zsh)
                 </strong>
               </div>
               <p style={{ fontSize: '12px', color: 'var(--muted)', margin: '0 0 12px', lineHeight: 1.5 }}>
-                Supports macOS 12+ (Apple Silicon & Intel) with zero dependencies.
+                Native zsh command with automatic Homebrew/nvm Node detection.
               </p>
               <div
                 style={{
                   background: 'var(--night)',
-                  color: 'var(--lime)',
+                  color: '#FFFFFF',
                   padding: '10px 12px',
                   borderRadius: '8px',
-                  font: '12px monospace',
-                  marginBottom: '12px',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px',
                   wordBreak: 'break-all',
                 }}
               >
-                {macCommand}
+                <span>{macCommand}</span>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(macCommand, 'mac')}
+                  style={{
+                    background: copiedKey === 'mac' ? 'var(--lime)' : 'rgba(255, 255, 255, 0.15)',
+                    color: copiedKey === 'mac' ? 'var(--ink)' : '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '4px 8px',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    flexShrink: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  {copiedKey === 'mac' ? <Check size={12} strokeWidth={2} /> : <Copy size={12} strokeWidth={2} />}
+                  <span>{copiedKey === 'mac' ? 'Copied' : 'Copy'}</span>
+                </button>
               </div>
             </div>
-            <button
-              type="button"
-              className="button button-dark"
-              onClick={() => copyToClipboard(macCommand, 'mac')}
-              style={{ width: '100%', minHeight: '40px', fontSize: '12px' }}
-            >
-              {copiedKey === 'mac' ? '✓ Copied Command!' : 'Copy macOS Command'}
-            </button>
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', fontSize: '11px', color: 'var(--muted)' }}>
-          Design preview demonstration launcher. Requires Node.js 18+ installed on your system.
+        <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>
+          Node.js &gt;= 20 required. Zero telemetry or unreviewed code changes.
         </div>
       </div>
     </div>
@@ -198,4 +233,3 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({ isOpen, onClos
 };
 
 export default QuickStartModal;
-
