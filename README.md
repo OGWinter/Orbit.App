@@ -81,7 +81,7 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
 
 ## Tech Stack & Tooling
 
-- **Node.js Environment**: `>=18.0.0` (LTS recommended; tested across Node 18, 20, 22)
+- **Node.js Environment**: `>=20.0.0` (Node 20+ required)
 - **React 18**: Core component hierarchy (`^18.3.1`)
 - **React Router 7**: Modern client-side routing & deep-link navigation (`^7.x`)
 - **TypeScript 5**: Strict type verification (`^5.6.3`)
