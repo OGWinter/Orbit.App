@@ -287,7 +287,7 @@ export const ResetPasswordView: React.FC = () => {
             </div>
 
             <div className="auth-footer-prompt">
-              Remember your password?
+              <span>Remember your password?</span>
               <Link to="/login" onClick={() => clearRecoverySession()}>
                 Sign in here
               </Link>
@@ -451,7 +451,7 @@ export const ResetPasswordView: React.FC = () => {
             </form>
 
             <div className="auth-footer-prompt">
-              Remembered your existing password?
+              <span>Remembered your existing password?</span>
               <Link to="/login" onClick={() => clearRecoverySession()}>
                 Sign In
               </Link>

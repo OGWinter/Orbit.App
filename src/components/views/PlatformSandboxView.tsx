@@ -163,9 +163,9 @@ export const PlatformSandboxView: React.FC<PlatformSandboxViewProps> = ({
           </div>
 
           {/* Columns Layout */}
-          <div className="sandbox-workspace-columns" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '620px' }}>
+          <div className="sandbox-workspace-columns">
             {/* Left Column: Code Editor & Logs */}
-            <div style={{ padding: '20px', borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: '16px', background: '#fafbfc' }}>
+            <div className="sandbox-editor-column">
               {/* Task Prompt Box */}
               <div style={{ display: 'flex', gap: '8px', background: '#fff', padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--line)' }}>
                 <span style={{ color: 'var(--violet)', display: 'grid', placeItems: 'center' }}>
@@ -286,7 +286,7 @@ app.get('/api/v1/products/atlas-refresh', (req, res) => {
             </div>
 
             {/* Right Column: Live Browser Viewport Preview */}
-            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="sandbox-preview-column">
               {/* Viewport Control Bar */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: '6px' }}>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -24,12 +23,6 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, headerRightAct
         </Link>
 
         <div className="auth-header-actions">
-          <div className="auth-preview-badge">
-            <span className="live-dot" />
-            <ShieldCheck size={12} strokeWidth={2} style={{ display: 'inline', marginRight: '2px' }} aria-hidden="true" />
-            <span>SECURE AUTH</span>
-          </div>
-
           {headerRightAction || (
             <Link to="/" className="auth-nav-link">
               ← Back to Website
@@ -46,19 +39,13 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, headerRightAct
       {/* Bottom Footer */}
       <footer className="auth-footer" role="contentinfo">
         <div className="auth-footer-links">
-          <a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Notice: Orbit uses official Supabase Auth. Session state is managed via secure browser storage.'); }}>
-            Privacy Policy
-          </a>
+          <span>Official Supabase Auth Integration</span>
           <span>•</span>
-          <a href="#terms" onClick={(e) => { e.preventDefault(); alert('Terms of Service: Orbit V2 developer workspace edition.'); }}>
-            Terms of Service
-          </a>
+          <Link to="/">Platform Overview</Link>
           <span>•</span>
-          <a href="#security" onClick={(e) => { e.preventDefault(); alert('Security: Row Level Security (RLS) and cryptographic session security active.'); }}>
-            Security Architecture
-          </a>
+          <Link to="/workspace">Workspace</Link>
         </div>
-        <div>
+        <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--orbit-text-secondary, #647386)' }}>
           © {new Date().getFullYear()} Orbit Studio • Precision & Momentum
         </div>
       </footer>

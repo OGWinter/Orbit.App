@@ -50,6 +50,8 @@ export const WorkspaceView: React.FC = () => {
   const userDisplayName =
     user?.user_metadata?.full_name || (user?.email ? user.email.split('@')[0] : 'Developer');
 
+  const userEmail = user?.email || '';
+
   const userInitials =
     user?.user_metadata?.full_name
       ? user.user_metadata.full_name
@@ -212,8 +214,8 @@ export const WorkspaceView: React.FC = () => {
               <span className="workspace-user-name" title={userDisplayName}>
                 {userDisplayName}
               </span>
-              <span className="workspace-user-email" title={user?.email || ''}>
-                {user?.email}
+              <span className="workspace-user-email" title={userEmail}>
+                {userEmail}
               </span>
             </div>
             <button
@@ -289,7 +291,7 @@ export const WorkspaceView: React.FC = () => {
             <h2 id="welcome-heading">Welcome back, {userDisplayName}</h2>
             <p>
               Your Orbit developer workspace shell is ready. Connected to account identity{' '}
-              <strong>{user?.email}</strong>. This is your personal workspace where upcoming repository
+              <strong>{userEmail}</strong>. This is your personal workspace where upcoming repository
               connections, branch workflows, and human-in-the-loop AI orchestration will run.
             </p>
           </div>

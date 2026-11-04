@@ -156,9 +156,6 @@ export const Header: React.FC<HeaderProps> = ({
                   closeMenu();
                   onOpenQuickStart();
                 }}
-                style={{
-                  color: '#059669',
-                }}
               >
                 <span>Start on Win / Mac</span>
                 <Zap size={13} strokeWidth={2} aria-hidden="true" />

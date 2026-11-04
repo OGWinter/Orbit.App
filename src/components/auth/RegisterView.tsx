@@ -416,7 +416,7 @@ export const RegisterView: React.FC = () => {
         )}
 
         <div className="auth-footer-prompt">
-          Already have an Orbit account?
+          <span>Already have an Orbit account?</span>
           <Link to="/login">Sign in here</Link>
         </div>
       </div>

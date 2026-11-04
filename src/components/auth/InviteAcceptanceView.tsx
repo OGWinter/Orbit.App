@@ -379,7 +379,7 @@ export const InviteAcceptanceView: React.FC = () => {
             </form>
 
             <div className="auth-footer-prompt">
-              Already accepted an invite?
+              <span>Already accepted an invite?</span>
               <Link to="/login">Sign In</Link>
             </div>
           </div>

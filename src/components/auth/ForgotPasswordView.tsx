@@ -128,7 +128,7 @@ export const ForgotPasswordView: React.FC = () => {
             </div>
 
             <div className="auth-footer-prompt">
-              Remember your password?
+              <span>Remember your password?</span>
               <Link to="/login">Back to Sign In</Link>
             </div>
           </div>
@@ -169,7 +169,7 @@ export const ForgotPasswordView: React.FC = () => {
             </button>
 
             <div className="auth-footer-prompt">
-              Remembered your credentials?
+              <span>Remembered your credentials?</span>
               <Link to="/login">Back to Sign In</Link>
             </div>
           </form>

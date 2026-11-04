@@ -654,59 +654,33 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </div>
         </div>
 
-        {/* Sunglasses E-Commerce Live Preview Float Card */}
-        <div
-          className="preview-float"
-          onClick={() => onOpenPlatformDemo()}
-          role="button"
-          tabIndex={0}
-          title="Click to expand Sandbox Preview"
-        >
-          <div className="preview-label">
-            <span className="preview-dot" /> LIVE PREVIEW (DEMO)
-          </div>
-          <div className="preview-image">
-            <div className="preview-sun" />
-            <div className="preview-product" />
-            <div className="preview-copy">
-              <i />
-              <i />
-              <b />
-            </div>
-          </div>
-          <div className="preview-caption">
-            <span>Product detail</span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenPlatformDemo();
-              }}
-              className="btn-open-preview-link"
-              title="Open Sandbox"
-            >
-              <ArrowUpRight size={13} /> Open
-            </button>
-          </div>
+        {/* Docked Inspector Controls */}
+        <div className="hero-inspector-bar">
+          <button
+            type="button"
+            className="floating-tag tag-plan tag-interactive-btn"
+            onClick={() => setActivePopover('plan')}
+            title="Click to view Architecture Plan"
+          >
+            <Layers size={13} /> Plan Spec
+          </button>
+          <button
+            type="button"
+            className="floating-tag tag-verify tag-interactive-btn"
+            onClick={() => setActivePopover('verify')}
+            title="Click to view Browser Verification Results"
+          >
+            <CheckCircle2 size={13} /> Verify Suite
+          </button>
+          <button
+            type="button"
+            className="floating-tag tag-interactive-btn"
+            onClick={() => onOpenPlatformDemo()}
+            title="Open Interactive Platform Sandbox"
+          >
+            <ArrowUpRight size={13} /> Sandbox Demo
+          </button>
         </div>
-
-        {/* Floating Tags */}
-        <button
-          type="button"
-          className="floating-tag tag-plan tag-interactive-btn"
-          onClick={() => setActivePopover('plan')}
-          title="Click to view Architecture Plan"
-        >
-          <Layers size={13} /> Plan
-        </button>
-        <button
-          type="button"
-          className="floating-tag tag-verify tag-interactive-btn"
-          onClick={() => setActivePopover('verify')}
-          title="Click to view Browser Verification Results"
-        >
-          <CheckCircle2 size={13} /> Verify
-        </button>
       </div>
 
       {/* Plan Popover Dialog */}
