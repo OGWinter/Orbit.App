@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import type { Session, User, AuthError } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured, getSupabaseConfigError } from '../services/supabase';
 
@@ -8,11 +8,13 @@ export interface AuthContextType {
   loading: boolean;
   isConfigured: boolean;
   configError: string | null;
+  isRecoverySession: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: AuthError | Error | null; needsEmailVerification?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | Error | null }>;
   signOut: () => Promise<{ error: AuthError | Error | null }>;
   resetPasswordForEmail: (email: string) => Promise<{ error: AuthError | Error | null }>;
   updatePassword: (password: string) => Promise<{ error: AuthError | Error | null }>;
+  clearRecoverySession: () => void;
 }
 
 const defaultAuthContext: AuthContextType = {
@@ -21,11 +23,13 @@ const defaultAuthContext: AuthContextType = {
   loading: false,
   isConfigured: false,
   configError: null,
+  isRecoverySession: false,
   signUp: async () => ({ error: new Error('AuthProvider is not mounted') }),
   signIn: async () => ({ error: new Error('AuthProvider is not mounted') }),
   signOut: async () => ({ error: null }),
   resetPasswordForEmail: async () => ({ error: new Error('AuthProvider is not mounted') }),
   updatePassword: async () => ({ error: new Error('AuthProvider is not mounted') }),
+  clearRecoverySession: () => {},
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,6 +38,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isRecoverySession, setIsRecoverySession] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash || '';
+      const search = window.location.search || '';
+      return (
+        hash.includes('type=recovery') ||
+        search.includes('type=recovery') ||
+        search.includes('recovery=true')
+      );
+    }
+    return false;
+  });
+
+  const isRecoveryRef = useRef<boolean>(isRecoverySession);
+  useEffect(() => {
+    isRecoveryRef.current = isRecoverySession;
+  }, [isRecoverySession]);
+
   const configured = isSupabaseConfigured();
   const configError = getSupabaseConfigError();
 
@@ -72,13 +94,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
 
-    // Listen to auth state transitions
+    // Listen to Supabase auth transitions
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+    } = supabase.auth.onAuthStateChange((event, currentSession) => {
       if (isMounted) {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
+
+        // Supabase fires PASSWORD_RECOVERY when recovery link/token is processed
+        if (event === 'PASSWORD_RECOVERY') {
+          isRecoveryRef.current = true;
+          setIsRecoverySession(true);
+        } else if (event === 'SIGNED_OUT') {
+          isRecoveryRef.current = false;
+          setIsRecoverySession(false);
+        }
+
         setLoading(false);
       }
     });
@@ -96,7 +128,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ): Promise<{ error: AuthError | Error | null; needsEmailVerification?: boolean }> => {
     if (!configured || !supabase) {
       return {
-        error: new Error(configError || 'Supabase authentication is not configured. Please check your environment variables.'),
+        error: new Error(
+          configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
+        ),
       };
     }
 
@@ -116,7 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Check if email confirmation is required:
-      // When email confirmation is enabled, Supabase does not return an active session immediately.
+      // When email confirmation is enabled in Supabase, data.session is null until verified.
       const needsEmailVerification = !data.session;
       return { error: null, needsEmailVerification };
     } catch (err) {
@@ -132,7 +166,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ): Promise<{ error: AuthError | Error | null }> => {
     if (!configured || !supabase) {
       return {
-        error: new Error(configError || 'Supabase authentication is not configured. Please check your environment variables.'),
+        error: new Error(
+          configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
+        ),
       };
     }
 
@@ -151,6 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async (): Promise<{ error: AuthError | Error | null }> => {
+    setIsRecoverySession(false);
     if (!configured || !supabase) {
       setSession(null);
       setUser(null);
@@ -176,7 +213,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ): Promise<{ error: AuthError | Error | null }> => {
     if (!configured || !supabase) {
       return {
-        error: new Error(configError || 'Supabase authentication is not configured. Please check your environment variables.'),
+        error: new Error(
+          configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
+        ),
       };
     }
 
@@ -199,7 +238,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ): Promise<{ error: AuthError | Error | null }> => {
     if (!configured || !supabase) {
       return {
-        error: new Error(configError || 'Supabase authentication is not configured. Please check your environment variables.'),
+        error: new Error(
+          configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
+        ),
+      };
+    }
+
+    // Verify recovery authorization is present
+    const hasRecoveryUrl =
+      typeof window !== 'undefined' &&
+      (window.location.hash.includes('type=recovery') ||
+        window.location.search.includes('type=recovery') ||
+        window.location.search.includes('recovery=true'));
+
+    if (!isRecoverySession && !isRecoveryRef.current && !hasRecoveryUrl) {
+      return {
+        error: new Error('Recovery authorization required: You must access this page via a valid password recovery link.'),
       };
     }
 
@@ -207,6 +261,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.updateUser({
         password,
       });
+
+      if (!error) {
+        isRecoveryRef.current = false;
+        setIsRecoverySession(false);
+      }
 
       return { error };
     } catch (err) {
@@ -216,17 +275,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const clearRecoverySession = () => {
+    setIsRecoverySession(false);
+  };
+
   const value: AuthContextType = {
     user,
     session,
     loading,
     isConfigured: configured,
     configError,
+    isRecoverySession,
     signUp,
     signIn,
     signOut,
     resetPasswordForEmail,
     updatePassword,
+    clearRecoverySession,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

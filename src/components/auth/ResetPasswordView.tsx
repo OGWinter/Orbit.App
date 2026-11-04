@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export const ResetPasswordView: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const { updatePassword, isConfigured, configError } = useAuth();
+  const { updatePassword, isConfigured, configError, isRecoverySession } = useAuth();
 
   // Detect expired or invalid link from search params or hash fragment
   const isHashError =
@@ -17,6 +17,15 @@ export const ResetPasswordView: React.FC = () => {
     searchParams.get('token') === 'invalid' ||
     searchParams.get('error') !== null ||
     isHashError;
+
+  // Determine if recovery authorization has been established
+  const isRecoveryFromUrl =
+    typeof window !== 'undefined' &&
+    (window.location.hash.includes('type=recovery') ||
+      searchParams.get('type') === 'recovery' ||
+      searchParams.get('recovery') === 'true');
+
+  const isRecoveryAuthorized = isRecoverySession || isRecoveryFromUrl;
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -74,8 +83,14 @@ export const ResetPasswordView: React.FC = () => {
 
     if (!isConfigured) {
       setServerError(
-        configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.'
+        configError ||
+          'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
       );
+      return;
+    }
+
+    if (!isRecoveryAuthorized) {
+      setServerError('A valid password recovery session is required before updating your password.');
       return;
     }
 
@@ -196,6 +211,52 @@ export const ResetPasswordView: React.FC = () => {
               </Link>
             </div>
           </div>
+        ) : !isRecoveryAuthorized ? (
+          /* Hardened State: Missing Recovery Authorization (Direct access or generic session) */
+          <div>
+            <div className="auth-card-header">
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.28)',
+                  padding: '3px 9px',
+                  borderRadius: '999px',
+                  color: '#fcd34d',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  marginBottom: '10px',
+                }}
+              >
+                <span>⚠</span> AUTHORIZATION REQUIRED
+              </div>
+              <h1>Password reset authorization required</h1>
+              <p>No active password recovery session was detected.</p>
+            </div>
+
+            <div className="auth-notice-box error" role="alert">
+              <span>⚠</span>
+              <div>
+                <strong>Recovery Session Missing:</strong>
+                <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
+                  To update your password, you must access this page via the secure recovery link dispatched to your verified email address. Direct access without valid recovery authorization is not permitted.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '24px' }}>
+              <Link to="/forgot-password" className="auth-submit-btn" style={{ textDecoration: 'none' }}>
+                Request Password Reset Link <span>→</span>
+              </Link>
+            </div>
+
+            <div className="auth-footer-prompt">
+              Remember your password?
+              <Link to="/login">Sign in here</Link>
+            </div>
+          </div>
         ) : (
           <div>
             <div className="auth-card-header">
@@ -209,7 +270,8 @@ export const ResetPasswordView: React.FC = () => {
                 <div>
                   <strong>Configuration Required:</strong>
                   <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
-                    {configError || 'Supabase environment variables are missing. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable password updates.'}
+                    {configError ||
+                      'Supabase environment variables are missing. Configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to enable password updates.'}
                   </p>
                 </div>
               </div>

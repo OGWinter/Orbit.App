@@ -34,7 +34,7 @@ export const ForgotPasswordView: React.FC = () => {
     if (!validate()) return;
 
     if (!isConfigured) {
-      setServerError(configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.');
+      setServerError(configError || 'Supabase authentication is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.');
       return;
     }
 
@@ -84,7 +84,7 @@ export const ForgotPasswordView: React.FC = () => {
             <div>
               <strong>Configuration Required:</strong>
               <p style={{ margin: '4px 0 0', fontSize: '12px', lineHeight: 1.5 }}>
-                {configError || 'Supabase environment variables are missing. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable authentication.'}
+                {configError || 'Supabase environment variables are missing. Configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to enable authentication.'}
               </p>
             </div>
           </div>

@@ -83,7 +83,11 @@ Matched 1:1 with [oribit-app.vercel.app](https://oribit-app.vercel.app/) visual 
     - Powered by Supabase Auth (`@supabase/supabase-js`).
     - Real account registration with full name metadata and email verification enforcement.
     - Real sign-in and sign-out with persistent sessions restored across reloads.
-    - Real password recovery dispatch and password updating via recovery tokens.
+    - Hardened password recovery flow:
+      - Recovery emails dispatched via Supabase Auth with redirect to `/reset-password`.
+      - Password updates strictly require a valid Supabase recovery authorization / session event (`PASSWORD_RECOVERY`).
+      - Direct access or generic authenticated sessions are safely blocked with a recovery authorization requirement notice.
+      - Expired and invalid tokens are detected and routed to dedicated renewal flows.
     - Explicit error handling for missing configuration, invalid credentials, and expired recovery links.
     - Invitation acceptance view (`/invite`) preserved as an explicit demonstration screen.
 
@@ -99,12 +103,15 @@ Orbit uses **Supabase Auth** for production-grade email-and-password authenticat
 2. Click **New project** and specify a Project Name (e.g. `orbit-workspace`), database password, and preferred region.
 3. Wait for the project initialization to complete.
 
-### 2. Locate Your Project URL & Public Anon Key
+### 2. Locate Your Project URL & Publishable Key
 
 1. In the Supabase project dashboard, navigate to **Project Settings** (gear icon) -> **API**.
 2. Under **Project URL**, copy the `URL` (e.g., `https://xyzcompany.supabase.co`).
-3. Under **Project API keys**, locate the `anon` / `public` key and copy its value.
-4. **Security Notice**: Never copy or use the `service_role` secret key in frontend code. Use strictly the `anon` public key.
+3. Under **Project API keys**, locate the **publishable / anon key** and copy its value.
+4. **Security Notice**:
+   - The publishable key (`VITE_SUPABASE_PUBLISHABLE_KEY`) is intended specifically for client browser use.
+   - Database security relies on proper Supabase **Row Level Security (RLS)** policies on your tables.
+   - **Never** expose or use a Supabase `service_role` or secret key in frontend code or client-side bundles.
 
 ### 3. Configure Local Environment Variables
 
@@ -118,7 +125,7 @@ Set the copied Supabase credentials:
 
 ```env
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 *Note: If these variables are not configured or invalid, Orbit displays a clear configuration banner on all auth screens and prevents unconfigured requests.*
@@ -154,14 +161,14 @@ The automated test suite (`npm test`) uses mocked Supabase clients to verify UI 
 | **Sign In** | Live Supabase Project & Verified User | 1. Navigate to `/login`.<br>2. Enter credentials for confirmed account.<br>3. Click *Sign In to Workspace*.<br>4. Verify redirect to `/` and header displaying user pill and *Sign out* button. |
 | **Session Restoration** | Local Browser Storage | 1. While signed in, refresh the page or open a new browser tab.<br>2. Confirm the user remains signed in without UI flicker. |
 | **Sign Out** | Active Session | 1. Click *Sign out* in the header.<br>2. Verify user badge disappears and *Sign in* button returns.<br>3. Confirm session is cleared in browser storage. |
-| **Password Recovery** | Real Email Inbox | 1. Navigate to `/forgot-password`.<br>2. Submit registered email.<br>3. Confirm notice: *"If an account exists... recovery instructions have been dispatched"*. |
-| **Password Update** | Real Email Inbox | 1. Click the recovery link in the received email (redirects to `/reset-password`).<br>2. Enter a new password matching confirmation.<br>3. Submit and confirm: *"Password updated successfully via Supabase Auth"*. |
+| **Password Recovery Request** | Real Email Inbox | 1. Navigate to `/forgot-password`.<br>2. Submit registered email.<br>3. Confirm notice: *"If an account exists... recovery instructions have been dispatched"*. |
+| **Password Update Authorization** | Real Email Inbox | 1. Direct access to `/reset-password` without recovery authorization displays: *"Password reset authorization required"*.<br>2. Click the recovery link in the received email (redirects to `/reset-password#access_token=...&type=recovery`).<br>3. Verify recovery form is unlocked.<br>4. Enter a new password matching confirmation.<br>5. Submit and confirm: *"Password updated successfully via Supabase Auth"*. |
 
 ---
 
 ## Tech Stack & Tooling
 
-- **Node.js Environment**: `>=20.0.0` (Node 20+ required)
+- **Node.js Environment**: `>=22.0.0` (Node 22+ required)
 - **React 18**: Core component hierarchy (`^18.3.1`)
 - **React Router 7**: Modern client-side routing & deep-link navigation (`^7.x`)
 - **Supabase SDK**: `@supabase/supabase-js` (`^2.x`)
@@ -174,7 +181,7 @@ The automated test suite (`npm test`) uses mocked Supabase clients to verify UI 
 ## Getting Started
 
 ```bash
-# Ensure Node.js >=20 is installed
+# Ensure Node.js >=22 is installed
 node -v
 
 # Install dependencies

@@ -47,6 +47,9 @@ vi.mock('../services/supabase', () => ({
 
 const renderWithAuth = async (ui: React.ReactElement, initialEntries = ['/']) => {
   let view: any;
+  if (typeof window !== 'undefined' && initialEntries[0]) {
+    window.history.pushState(null, '', initialEntries[0]);
+  }
   await act(async () => {
     view = render(
       <MemoryRouter initialEntries={initialEntries}>
@@ -57,7 +60,7 @@ const renderWithAuth = async (ui: React.ReactElement, initialEntries = ['/']) =>
   return view;
 };
 
-describe('Phase 3 — Real Supabase Authentication Test Suite', () => {
+describe('Phase 3.1 — Supabase Auth Hardening & Configuration Fixes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockIsConfigured = true;
@@ -77,17 +80,19 @@ describe('Phase 3 — Real Supabase Authentication Test Suite', () => {
     });
   });
 
-  describe('Missing Supabase Configuration', () => {
-    it('displays configuration error notice when Supabase is not configured', async () => {
+  describe('Supabase Environment Configuration & Missing Variables', () => {
+    it('displays configuration error notice referencing VITE_SUPABASE_PUBLISHABLE_KEY when unconfigured', async () => {
       mockIsConfigured = false;
-      mockConfigError = 'Missing VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in environment.';
+      mockConfigError = 'Missing VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in environment.';
 
       await renderWithAuth(<RegisterView />);
 
       expect(screen.getByRole('alert')).toBeInTheDocument();
-      expect(screen.getByText(/Missing VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Missing VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY/i)
+      ).toBeInTheDocument();
 
-      // Attempting to submit also blocks with error notice
+      // Form submission is blocked
       fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Ada Lovelace' } });
       fireEvent.change(screen.getByLabelText(/Work Email/i), { target: { value: 'ada@lovelace.dev' } });
       fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'StrongPass2026!' } });
@@ -281,21 +286,42 @@ describe('Phase 3 — Real Supabase Authentication Test Suite', () => {
     });
   });
 
-  describe('ResetPasswordView (/reset-password)', () => {
+  describe('Hardened ResetPasswordView (/reset-password)', () => {
+    it('blocks direct access and shows authorization required state when no recovery session is active', async () => {
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
+
+      expect(
+        screen.getByRole('heading', { name: /Password reset authorization required/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/No active password recovery session was detected/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: /Request Password Reset Link/i })
+      ).toBeInTheDocument();
+
+      // Form input should NOT be accessible
+      expect(screen.queryByLabelText(/^New Password$/i)).not.toBeInTheDocument();
+    });
+
     it('renders expired view when ?expired=true or ?token=invalid is provided', async () => {
       await renderWithAuth(<ResetPasswordView />, ['/reset-password?expired=true']);
 
       expect(screen.getByRole('heading', { name: /Reset link expired/i })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /Request New Reset Link/i })).toBeInTheDocument();
+      expect(screen.queryByLabelText(/^New Password$/i)).not.toBeInTheDocument();
     });
 
-    it('submits new password to Supabase and displays success state', async () => {
+    it('unlocks password reset form and submits update when valid recovery authorization is established', async () => {
       mockUpdateUser.mockResolvedValueOnce({
         data: { user: { id: 'user-1' } },
         error: null,
       });
 
-      await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
+      // Accessible with recovery authorization parameter
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password?type=recovery']);
+
+      expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
 
       fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'BrandNewPass2026!' } });
       fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'BrandNewPass2026!' } });
@@ -307,6 +333,7 @@ describe('Phase 3 — Real Supabase Authentication Test Suite', () => {
           password: 'BrandNewPass2026!',
         });
         expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
+        expect(screen.getByText(/Your Orbit account password has been updated successfully via Supabase Auth/i)).toBeInTheDocument();
       });
     });
 
@@ -316,7 +343,7 @@ describe('Phase 3 — Real Supabase Authentication Test Suite', () => {
         error: { message: 'Auth session missing or token expired' },
       });
 
-      await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password?type=recovery']);
 
       fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'BrandNewPass2026!' } });
       fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'BrandNewPass2026!' } });
@@ -328,6 +355,59 @@ describe('Phase 3 — Real Supabase Authentication Test Suite', () => {
       });
 
       expect(screen.queryByRole('heading', { name: /Password updated/i })).not.toBeInTheDocument();
+    });
+
+    it('authorizes password update when PASSWORD_RECOVERY event is triggered by Supabase SDK', async () => {
+      let authCallback: any;
+      mockOnAuthStateChange.mockImplementationOnce((callback) => {
+        authCallback = callback;
+        return {
+          data: {
+            subscription: {
+              unsubscribe: vi.fn(),
+            },
+          },
+        };
+      });
+
+      mockUpdateUser.mockResolvedValueOnce({
+        data: { user: { id: 'u-recovery' } },
+        error: null,
+      });
+
+      // Initial load without recovery params
+      await renderWithAuth(<ResetPasswordView />, ['/reset-password']);
+
+      // Initially blocked
+      expect(
+        screen.getByRole('heading', { name: /Password reset authorization required/i })
+      ).toBeInTheDocument();
+
+      // Supabase fires PASSWORD_RECOVERY event
+      await act(async () => {
+        if (authCallback) {
+          authCallback('PASSWORD_RECOVERY', {
+            user: { id: 'u-recovery', email: 'dev@company.com' },
+            access_token: 'rec-tok',
+          });
+        }
+      });
+
+      // Password form is now unlocked
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
+      });
+
+      fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'ValidRecovery2026!' } });
+      fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'ValidRecovery2026!' } });
+      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
+
+      await waitFor(() => {
+        expect(mockUpdateUser).toHaveBeenCalledWith({
+          password: 'ValidRecovery2026!',
+        });
+        expect(screen.getByRole('heading', { name: /Password updated/i })).toBeInTheDocument();
+      });
     });
   });
 
@@ -430,12 +510,12 @@ describe('Phase 3 — Real Supabase Authentication Test Suite', () => {
       expect(screen.getByRole('heading', { name: /Reset password/i })).toBeInTheDocument();
     });
 
-    it('renders ResetPasswordView when directly loading /reset-password', async () => {
+    it('renders ResetPasswordView authorization check when directly loading /reset-password', async () => {
       window.history.pushState(null, '', '/reset-password');
       await act(async () => {
         render(<App />);
       });
-      expect(screen.getByRole('heading', { name: /Choose a new password/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /Password reset authorization required/i })).toBeInTheDocument();
     });
 
     it('renders InviteAcceptanceView when directly loading /invite', async () => {
