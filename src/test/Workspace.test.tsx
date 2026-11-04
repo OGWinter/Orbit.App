@@ -426,7 +426,7 @@ describe('Phase 4.1 — Authenticated Workspace Foundation', () => {
   });
 
   describe('3. Sign Out & Session Teardown', () => {
-    it('signing out removes access to protected content and redirects away from /workspace', async () => {
+    it('signing out successfully clears session, removes access to protected content, and redirects to /login', async () => {
       let authCallback: any;
       mockOnAuthStateChange.mockImplementationOnce((callback) => {
         authCallback = callback;
@@ -491,6 +491,131 @@ describe('Phase 4.1 — Authenticated Workspace Foundation', () => {
         expect(screen.getByRole('heading', { name: /Welcome back/i })).toBeInTheDocument();
       });
       expect(screen.queryByText(/Workspace Overview/i)).not.toBeInTheDocument();
+    });
+
+    it('failed sign-out keeps user authenticated in workspace and displays accessible error message', async () => {
+      mockGetSession.mockResolvedValueOnce({
+        data: {
+          session: {
+            user: { id: 'u-fail', email: 'developer@orbit.dev' },
+            access_token: 'tok',
+          },
+        },
+        error: null,
+      });
+
+      // Simulate Supabase returning an error during sign-out
+      mockSignOut.mockResolvedValueOnce({
+        error: { message: 'Network connection failed while signing out' },
+      });
+
+      await act(async () => {
+        render(
+          <MemoryRouter initialEntries={['/workspace']}>
+            <AuthProvider>
+              <Routes>
+                <Route
+                  path="/workspace"
+                  element={
+                    <ProtectedRoute>
+                      <WorkspaceView />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/login" element={<SignInView />} />
+              </Routes>
+            </AuthProvider>
+          </MemoryRouter>
+        );
+      });
+
+      expect(screen.getByRole('heading', { name: /Workspace Overview/i })).toBeInTheDocument();
+
+      const signOutBtn = screen.getByRole('button', { name: /Sign out/i });
+      await act(async () => {
+        fireEvent.click(signOutBtn);
+      });
+
+      // Must NOT redirect to login
+      expect(screen.queryByRole('heading', { level: 1, name: /^Welcome back$/i })).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/Work Email/i)).not.toBeInTheDocument();
+      // Must remain authenticated on /workspace
+      expect(screen.getByRole('heading', { name: /Workspace Overview/i })).toBeInTheDocument();
+      // Displays clear, accessible error message in alert role
+      const alerts = screen.getAllByRole('alert');
+      expect(alerts.length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/Network connection failed while signing out/i).length).toBeGreaterThanOrEqual(1);
+      // Sign-out button is re-enabled for retry
+      expect(screen.getByRole('button', { name: /Sign out/i })).toBeEnabled();
+    });
+
+    it('disables sign-out button and prevents duplicate requests while sign-out is in progress', async () => {
+      mockGetSession.mockResolvedValueOnce({
+        data: {
+          session: {
+            user: { id: 'u-in-flight', email: 'fastclick@orbit.dev' },
+            access_token: 'tok',
+          },
+        },
+        error: null,
+      });
+
+      let resolveSignOut!: (value: any) => void;
+      const pendingSignOut = new Promise((resolve) => {
+        resolveSignOut = resolve;
+      });
+      mockSignOut.mockReturnValueOnce(pendingSignOut);
+
+      await act(async () => {
+        render(
+          <MemoryRouter initialEntries={['/workspace']}>
+            <AuthProvider>
+              <Routes>
+                <Route
+                  path="/workspace"
+                  element={
+                    <ProtectedRoute>
+                      <WorkspaceView />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/login" element={<SignInView />} />
+              </Routes>
+            </AuthProvider>
+          </MemoryRouter>
+        );
+      });
+
+      const signOutBtn = screen.getByRole('button', { name: /Sign out/i });
+
+      // First click initiates sign-out
+      await act(async () => {
+        fireEvent.click(signOutBtn);
+      });
+
+      // Button is now disabled and shows pending text
+      expect(signOutBtn).toBeDisabled();
+      expect(screen.getByRole('button', { name: /Signing out/i })).toBeInTheDocument();
+      expect(mockSignOut).toHaveBeenCalledTimes(1);
+
+      // Attempt duplicate click while in progress
+      await act(async () => {
+        fireEvent.click(signOutBtn);
+      });
+
+      // mockSignOut must NOT have been called a second time
+      expect(mockSignOut).toHaveBeenCalledTimes(1);
+
+      // Resolve the sign-out with an error
+      await act(async () => {
+        resolveSignOut({ error: { message: 'Sign-out service unavailable' } });
+      });
+
+      // Button is re-enabled and error message is displayed
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /Sign out/i })).toBeEnabled();
+        expect(screen.getAllByText(/Sign-out service unavailable/i).length).toBeGreaterThanOrEqual(1);
+      });
     });
   });
 

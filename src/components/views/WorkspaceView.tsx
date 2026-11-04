@@ -6,10 +6,30 @@ export const WorkspaceView: React.FC = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/login', { replace: true });
+    if (signingOut) return;
+    setSigningOut(true);
+    setSignOutError(null);
+
+    try {
+      const result = await signOut();
+      if (result && result.error) {
+        setSignOutError(
+          result.error.message || 'Unable to sign out. Please check your network connection and try again.'
+        );
+      } else {
+        navigate('/login', { replace: true });
+      }
+    } catch (err) {
+      setSignOutError(
+        err instanceof Error ? err.message : 'An unexpected error occurred during sign-out.'
+      );
+    } finally {
+      setSigningOut(false);
+    }
   };
 
   const userDisplayName =
@@ -164,31 +184,60 @@ export const WorkspaceView: React.FC = () => {
         </nav>
 
         {/* User Account Section at Bottom */}
-        <div className="workspace-user-card">
-          <div className="workspace-avatar" aria-hidden="true">
-            {userInitials}
+        <div className="workspace-user-section">
+          {signOutError && (
+            <div className="workspace-signout-error" role="alert" aria-live="assertive">
+              <span aria-hidden="true">⚠</span>
+              <span>Sign-out failed: {signOutError}</span>
+            </div>
+          )}
+          <div className="workspace-user-card">
+            <div className="workspace-avatar" aria-hidden="true">
+              {userInitials}
+            </div>
+            <div className="workspace-user-info">
+              <span className="workspace-user-name" title={userDisplayName}>
+                {userDisplayName}
+              </span>
+              <span className="workspace-user-email" title={user?.email || ''}>
+                {user?.email}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="workspace-signout-btn"
+              onClick={handleSignOut}
+              disabled={signingOut}
+              aria-disabled={signingOut}
+              aria-label={signingOut ? 'Signing out of Orbit...' : 'Sign out of Orbit'}
+            >
+              {signingOut ? 'Signing out...' : 'Sign out'}
+            </button>
           </div>
-          <div className="workspace-user-info">
-            <span className="workspace-user-name" title={userDisplayName}>
-              {userDisplayName}
-            </span>
-            <span className="workspace-user-email" title={user?.email || ''}>
-              {user?.email}
-            </span>
-          </div>
-          <button
-            type="button"
-            className="workspace-signout-btn"
-            onClick={handleSignOut}
-            aria-label="Sign out of Orbit"
-          >
-            Sign out
-          </button>
         </div>
       </aside>
 
       {/* Main Workspace Content */}
       <main className="workspace-main-content" role="main">
+        {signOutError && (
+          <div className="workspace-alert-banner error" role="alert" aria-live="assertive">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span aria-hidden="true">⚠</span>
+              <span>
+                <strong>Sign-out failed:</strong> {signOutError}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="workspace-alert-dismiss"
+              onClick={() => setSignOutError(null)}
+              aria-label="Dismiss error notification"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Topbar */}
         <header className="workspace-topbar">
           <div>
